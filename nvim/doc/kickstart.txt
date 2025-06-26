@@ -1,0 +1,60 @@
+================================================================================
+INTRODUCTION                                                  *kickstart.nvim*
+
+Kickstart.nvim is a project to help you get started on your neovim journey.
+
+                                                            *kickstart-is-not*
+It is not:
+- Complete framework for every plugin under the sun
+- Place to add every plugin that could ever be useful
+
+                                                                *kickstart-is*
+It is:
+- Somewhere that has a good start for the most common "IDE" type features:
+    - autocompletion
+    - goto-definition
+    - find references
+    - fuzzy finding
+    - and hinting at what more can be done :)
+- A place to _kickstart_ your journey.
+    - You should fork this project and use/modify it so that it matches your
+      style and preferences. If you don't want to do that, there are probably
+      other projects that would fit much better for you (and that's great!)!
+
+ vim:tw=78:ts=8:ft=help:norl:
+
+
+ lua/
+├── config/
+│   ├── init.lua              -- Bootstrap and main entry point
+│   ├── options.lua           -- All Neovim settings and behavior
+│   ├── keymaps.lua           -- Global keybindings
+│   └── autocmds.lua          -- Auto-commands for enhanced workflow
+├── plugins/
+│   ├── core/                 -- Essential functionality (complex configs)
+│   │   ├── completion.lua    -- blink.cmp + blink-copilot
+│   │   ├── lsp.lua          -- nvim-lspconfig + mason + mason-lspconfig + lspsaga
+│   │   ├── treesitter.lua   -- nvim-treesitter + context + textobjects
+│   │   └── debugging.lua    -- nvim-dap + nvim-dap-ui + nvim-dap-virtual-text + nvim-dap-repl-highlights
+│   ├── ui/                  -- Visual interface (grouped by visual cohesion)
+│   │   ├── colorscheme.lua  -- nightfox + all themes + transparent.nvim + switchscheme.nvim
+│   │   ├── statusline.lua   -- lualine.nvim
+│   │   ├── notifications.lua -- noice.nvim + nvim-notify + nui.nvim
+│   │   ├── interface.lua    -- which-key.nvim + snacks.nvim (dashboard)
+│   │   └── visual-aids.lua  -- nvim-highlight-colors + indent-blankline.nvim + nvim-ufo (folding)
+│   ├── editor/              -- Text manipulation and navigation
+│   │   ├── navigation.lua   -- telescope.nvim + telescope-fzf-native + telescope-ui-select + flash.nvim
+│   │   ├── file-management.lua -- oil.nvim + neo-tree.nvim
+│   │   ├── editing.lua      -- mini.surround + auto-pairs functionality + vim-sleuth
+│   │   └── git.lua          -- gitsigns.nvim
+│   ├── tools/               -- Language-specific and utility tools
+│   │   ├── formatting.lua   -- conform.nvim + nvim-lint
+│   │   ├── typescript.lua   -- typescript-tools.nvim + package-info.nvim
+│   │   ├── copilot-chat.lua -- CopilotChat.nvim (separate from completion)
+│   │   ├── testing.lua      -- plenary.nvim + future test runners
+│   │   └── utilities.lua    -- todo-comments.nvim + vim-be-good + headlines.nvim
+│   └── future/              -- Prepared for expansion
+│       ├── java.lua         -- Future Java/Spring Boot tools
+│       ├── python.lua       -- Future Python tools
+│       └── go.lua           -- Future Go tools
+--]]
