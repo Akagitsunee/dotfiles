@@ -1,22 +1,22 @@
 # Default configuration file for tmux-powerline.
-# Modeline {
-#	 vi: foldmarker={,} foldmethod=marker foldlevel=0 tabstop=4 filetype=sh
-# }
+# Modeline 
+#	 vi: foldmarker=, foldmethod=marker foldlevel=0 tabstop=4 filetype=sh
 
-# General {
+
+# General 
 # Show which segment fails and its exit code.
 export TMUX_POWERLINE_DEBUG_MODE_ENABLED="false"
 # Use patched font symbols.
 export TMUX_POWERLINE_PATCHED_FONT_IN_USE="true"
 
 # The theme to use.
-export TMUX_POWERLINE_THEME="bubblealter"
+export TMUX_POWERLINE_THEME="bubble"
 # Overlay directory to look for themes. There you can put your own themes outside the repo. Fallback will still be the "themes" directory in the repo.
-export TMUX_POWERLINE_DIR_USER_THEMES="${XDG_CONFIG_HOME:-$HOME/.config}/tmux-powerline/themes"
+export TMUX_POWERLINE_DIR_USER_THEMES="$XDG_CONFIG_HOME:-$HOME/.config/tmux-powerline/themes"
 # Overlay directory to look for segments. There you can put your own segments outside the repo. Fallback will still be the "segments" directory in the repo.
-export TMUX_POWERLINE_DIR_USER_SEGMENTS="${XDG_CONFIG_HOME:-$HOME/.config}/tmux-powerline/segments"
+export TMUX_POWERLINE_DIR_USER_SEGMENTS="$XDG_CONFIG_HOME:-$HOME/.config/tmux-powerline/segments"
 
-# The initial visibility of the status bar. Can be {"on", "off", "2"}. 2 will create two status lines: one for the window list and one with status bar segments.
+# The initial visibility of the status bar. Can be "on", "off", "2". 2 will create two status lines: one for the window list and one with status bar segments.
 export TMUX_POWERLINE_STATUS_VISIBILITY="on"
 # In case of visibility = 2, where to display window status and where left/right status bars.
 # 0: window status top, left/right status bottom; 1: window status bottom, left/right status top
@@ -24,7 +24,7 @@ export TMUX_POWERLINE_WINDOW_STATUS_LINE=0
 # The status bar refresh interval in seconds.
 # Note that events that force-refresh the status bar (such as window renaming) will ignore this.
 export TMUX_POWERLINE_STATUS_INTERVAL="1"
-# The location of the window list. Can be {"absolute-centre, centre, left, right"}.
+# The location of the window list. Can be "absolute-centre, centre, left, right".
 # Note that "absolute-centre" is only supported on `tmux -V` >= 3.2.
 export TMUX_POWERLINE_STATUS_JUSTIFICATION="absolute-centre"
 
@@ -40,9 +40,9 @@ export TMUX_POWERLINE_WINDOW_STATUS_SEPARATOR=""
 # E.g. this example binding would mute the left status bar when pressing <prefix> followed by Ctrl-[
 #export TMUX_POWERLINE_MUTE_LEFT_KEYBINDING="C-["
 #export TMUX_POWERLINE_MUTE_RIGHT_KEYBINDING="C-]"
-# }
 
-# air.sh {
+
+# air.sh 
 # The data provider to use. Currently only "openweather" is supported.
 export TMUX_POWERLINE_SEG_AIR_DATA_PROVIDER="openweather"
 # How often to update the weather in seconds.
@@ -55,32 +55,32 @@ TMUX_POWERLINE_SEG_AIR_LAT=""
 TMUX_POWERLINE_SEG_AIR_LON=""
 # Your Open Weather API Key:
 TMUX_POWERLINE_SEG_AIR_OPEN_WEATHER_API_KEY=""
-# }
 
-# battery.sh {
-# How to display battery remaining. Can be {percentage, cute, hearts}.
+
+# battery.sh 
+# How to display battery remaining. Can be percentage, cute, hearts.
 export TMUX_POWERLINE_SEG_BATTERY_TYPE="percentage"
 # How may hearts to show if cute indicators are used.
 export TMUX_POWERLINE_SEG_BATTERY_NUM_HEARTS="5"
-# }
 
-# date_week.sh {
+
+# date_week.sh 
 # Symbol for calendar week.
 # export TMUX_POWERLINE_SEG_DATE_WEEK_SYMBOL="󰨳"
 # export TMUX_POWERLINE_SEG_DATE_WEEK_SYMBOL_COLOUR="255"
-# }
 
-# date.sh {
+
+# date.sh 
 # date(1) format for the date. If you don't, for some reason, like ISO 8601 format you might want to have "%D" or "%m/%d/%Y".
 export TMUX_POWERLINE_SEG_DATE_FORMAT="%F"
-# }
 
-# disk_usage.sh {
-# Filesystem to retrieve disk space information. Any from the filesystems available (run "df | awk '{print }'" to check them).
+
+# disk_usage.sh 
+# Filesystem to retrieve disk space information. Any from the filesystems available (run "df | awk 'print '" to check them).
 export TMUX_POWERLINE_SEG_DISK_USAGE_FILESYSTEM="/"
-# }
 
-# dropbox_status.sh {
+
+# dropbox_status.sh 
 # The Dropbox glyph to use
 export TMUX_POWERLINE_SEG_DROPBOX_GLYPH="\uf16b"
 # Replace 'Uploading' in the status
@@ -91,9 +91,9 @@ export TMUX_POWERLINE_SEG_DROPBOX_DOWNLOAD_GLYPH="\uf019"
 export TMUX_POWERLINE_SEG_DROPBOX_INDEX_GLYPH="\uf02e"
 # Replace 'Syncing' in the status
 export TMUX_POWERLINE_SEG_DROPBOX_SYNC_GLYPH="\uf46a"
-# }
 
-# earthquake.sh {
+
+# earthquake.sh 
 # The data provider to use. Currently only "goo" is supported.
 export TMUX_POWERLINE_SEG_EARTHQUAKE_DATA_PROVIDER="goo"
 # How often to update the earthquake data in seconds.
@@ -108,14 +108,14 @@ export TMUX_POWERLINE_SEG_EARTHQUAKE_ALERT_TIME_WINDOW="60"
 export TMUX_POWERLINE_SEG_EARTHQUAKE_TIME_FORMAT='(%H:%M)'
 # Display only if magnitude is greater or equal to this number
 export TMUX_POWERLINE_SEG_EARTHQUAKE_MIN_MAGNITUDE="3"
-# }
 
-# gcalcli.sh {
+
+# gcalcli.sh 
 # gcalcli uses 24hr time format by default - if you want to see 12hr time format, set TMUX_POWERLINE_SEG_GCALCLI_MILITARY_TIME_DEFAULT to 0
 export TMUX_POWERLINE_SEG_GCALCLI_24HR_TIME_FORMAT="1"
-# }
 
-# github_notifications.sh {
+
+# github_notifications.sh 
 # Github token (https://github.com/settings/tokens) with at least "notifications" scope
 export TMUX_POWERLINE_SEG_GITHUB_NOTIFICATIONS_TOKEN=""
 # Include available notification reasons (https://docs.github.com/en/rest/activity/notifications?apiVersion=2022-11-28#about-notification-reasons),
@@ -141,14 +141,14 @@ export TMUX_POWERLINE_SEG_GITHUB_NOTIFICATIONS_TOKEN=""
 # export TMUX_POWERLINE_SEG_GITHUB_NOTIFICATIONS_UPDATE_INTERVAL="60"
 # Enable Test Mode (to test how the segment will look like when you have notifications for all types/reasons)
 # export TMUX_POWERLINE_SEG_GITHUB_NOTIFICATIONS_TEST_MODE="no"
-# }
 
-# hostname.sh {
-# Use short or long format for the hostname. Can be {"short, long"}.
+
+# hostname.sh 
+# Use short or long format for the hostname. Can be "short, long".
 export TMUX_POWERLINE_SEG_HOSTNAME_FORMAT="short"
-# }
 
-# ifstat.sh {
+
+# ifstat.sh 
 # Symbol for Download.
 # export TMUX_POWERLINE_SEG_IFSTAT_DOWN_SYMBOL="⇊"
 # Symbol for Upload.
@@ -168,10 +168,10 @@ export TMUX_POWERLINE_SEG_HOSTNAME_FORMAT="short"
 # export TMUX_POWERLINE_SEG_IFSTAT_INTERFACE_EXCLUDES="^tun0$ ^tun1$" # excludes exactly 'tun0' and 'tun1'
 # Default:
 # export TMUX_POWERLINE_SEG_IFSTAT_INTERFACE_EXCLUDES="^u?tun[0-9]+$"
-# }
 
-# kubernetes_context.sh {
-# Kubernetes config context display mode {"name_namespace", "name", "namespace"}.
+
+# kubernetes_context.sh 
+# Kubernetes config context display mode "name_namespace", "name", "namespace".
 # export TMUX_POWERLINE_SEG_KUBERNETES_CONTEXT_DISPLAY_MODE="name_namespace"
 # Kubernetes config context symbol.
 # export TMUX_POWERLINE_SEG_KUBERNETES_CONTEXT_SYMBOL="󱃾"
@@ -179,21 +179,21 @@ export TMUX_POWERLINE_SEG_HOSTNAME_FORMAT="short"
 # export TMUX_POWERLINE_SEG_KUBERNETES_CONTEXT_SYMBOL_COLOUR="255"
 # Separator for display mode "name_namespace"
 # TMUX_POWERLINE_SEG_KUBERNETES_CONTEXT_SEPARATOR="󰿟"
-# }
 
-# lan_ip.sh {
+
+# lan_ip.sh 
 # Symbol for LAN IP.
 # export TMUX_POWERLINE_SEG_LAN_IP_SYMBOL="ⓛ "
 # Symbol colour for LAN IP
 # export TMUX_POWERLINE_SEG_LAN_IP_SYMBOL_COLOUR="255"
-# }
 
-# macos_notification_count.sh {
 
-# }
+# macos_notification_count.sh 
 
-# mailcount.sh {
-# Mailbox type to use. Can be any of {apple_mail, gmail, maildir, mbox, mailcheck}
+
+
+# mailcount.sh 
+# Mailbox type to use. Can be any of apple_mail, gmail, maildir, mbox, mailcheck
 export TMUX_POWERLINE_SEG_MAILCOUNT_MAILBOX_TYPE=""
 
 ## Gmail
@@ -222,10 +222,10 @@ export TMUX_POWERLINE_SEG_MAILCOUNT_MBOX_INBOX=""
 ## mailcheck
 # Optional path to mailcheckrc
 export TMUX_POWERLINE_SEG_MAILCOUNT_MAILCHECKRC="~/.mailcheckrc"
-# }
 
-# mode_indicator.sh {
-# Whether the normal & prefix mode section should be enabled. Should be {"true, "false"}.
+
+# mode_indicator.sh 
+# Whether the normal & prefix mode section should be enabled. Should be "true, "false".
 export TMUX_POWERLINE_SEG_MODE_INDICATOR_NORMAL_AND_PREFIX_MODE_ENABLED="true"
 # Normal mode text & color overrides. Defaults to "normal" & the segment foreground color set in the theme used.
 export TMUX_POWERLINE_SEG_MODE_INDICATOR_NORMAL_MODE_TEXT="normal"
@@ -233,12 +233,12 @@ export TMUX_POWERLINE_SEG_MODE_INDICATOR_NORMAL_MODE_TEXT_COLOR=""
 # Prefix mode text & color overrides. Defaults to "prefix" & the segment foreground color set in the theme used.
 export TMUX_POWERLINE_SEG_MODE_INDICATOR_PREFIX_MODE_TEXT="prefix"
 export TMUX_POWERLINE_SEG_MODE_INDICATOR_PREFIX_MODE_TEXT_COLOR=""
-# Whether the mouse mode section should be enabled. Should be {"true, "false"}.
+# Whether the mouse mode section should be enabled. Should be "true, "false".
 export TMUX_POWERLINE_SEG_MODE_INDICATOR_MOUSE_MODE_ENABLED="true"
 # Mouse mode text & color overrides. Defaults to "mouse" & the segment foreground color set in the theme used.
 export TMUX_POWERLINE_SEG_MODE_INDICATOR_MOUSE_MODE_TEXT="mouse"
 export TMUX_POWERLINE_SEG_MODE_INDICATOR_MOUSE_MODE_TEXT_COLOR=""
-# Whether the copy mode section should be enabled. Should be {"true, "false"}.
+# Whether the copy mode section should be enabled. Should be "true, "false".
 export TMUX_POWERLINE_SEG_MODE_INDICATOR_COPY_MODE_ENABLED="true"
 # Copy mode text & color overrides. Defaults to "copy" & the segment foreground color set in the theme used.
 export TMUX_POWERLINE_SEG_MODE_INDICATOR_COPY_MODE_TEXT="copy"
@@ -248,20 +248,20 @@ export TMUX_POWERLINE_SEG_MODE_INDICATOR_SUSPEND_MODE_TEXT="SUSPEND"
 export TMUX_POWERLINE_SEG_MODE_INDICATOR_SUSPEND_MODE_TEXT_COLOR=""
 # Separator text override. Defaults to " • ".
 export TMUX_POWERLINE_SEG_MODE_INDICATOR_SEPARATOR_TEXT=" • "
-# }
 
-# now_playing.sh {
-# Music player to use. Can be any of {audacious, banshee, cmus, apple_music, itunes, lastfm, plexamp, mocp, mpd, mpd_simple, pithos, playerctl, rdio, rhythmbox, spotify, file}.
+
+# now_playing.sh 
+# Music player to use. Can be any of audacious, banshee, cmus, apple_music, itunes, lastfm, plexamp, mocp, mpd, mpd_simple, pithos, playerctl, rdio, rhythmbox, spotify, file.
 export TMUX_POWERLINE_SEG_NOW_PLAYING_MUSIC_PLAYER="spotify"
 # File to be read in case the song is being read from a file
 export TMUX_POWERLINE_SEG_NOW_PLAYING_FILE_NAME=""
 # Maximum output length.
 export TMUX_POWERLINE_SEG_NOW_PLAYING_MAX_LEN="40"
-# How to handle too long strings. Can be {trim, roll}.
+# How to handle too long strings. Can be trim, roll.
 export TMUX_POWERLINE_SEG_NOW_PLAYING_TRIM_METHOD="trim"
 # Characters per second to roll if rolling trim method is used.
 export TMUX_POWERLINE_SEG_NOW_PLAYING_ROLL_SPEED="2"
-# Mode of roll text {"space", "repeat"}. space: fill up with empty space; repeat: repeat text from beginning
+# Mode of roll text "space", "repeat". space: fill up with empty space; repeat: repeat text from beginning
 # export TMUX_POWERLINE_SEG_NOW_PLAYING_ROLL_MODE="repeat"
 # Separator for "repeat" roll mode
 # export TMUX_POWERLINE_SEG_NOW_PLAYING_ROLL_SEPARATOR="   "
@@ -279,7 +279,7 @@ export TMUX_POWERLINE_SEG_NOW_PLAYING_MPD_PORT="6600"
 # Song display format for mpd_simple. See mpc(1) for delimiters.
 export TMUX_POWERLINE_SEG_NOW_PLAYING_MPD_SIMPLE_FORMAT="%artist% - %title%"
 # Song display format for playerctl. see "Format Strings" in playerctl(1).
-export TMUX_POWERLINE_SEG_NOW_PLAYING_PLAYERCTL_FORMAT="{{ artist }} - {{ title }}"
+export TMUX_POWERLINE_SEG_NOW_PLAYING_PLAYERCTL_FORMAT=" artist  -  title "
 # Song display format for rhythmbox. see "FORMATS" in rhythmbox-client(1).
 export TMUX_POWERLINE_SEG_NOW_PLAYING_RHYTHMBOX_FORMAT="%aa - %tt"
 
@@ -309,39 +309,39 @@ export TMUX_POWERLINE_SEG_NOW_PLAYING_PLEXAMP_TAUTULLI_HOST=""
 export TMUX_POWERLINE_SEG_NOW_PLAYING_PLEXAMP_TAUTULLI_API_KEY=""
 # How often in seconds to update the data from Plexamp.
 export TMUX_POWERLINE_SEG_NOW_PLAYING_PLEXAMP_UPDATE_PERIOD="30"
-# }
 
-# pwd.sh {
+
+# pwd.sh 
 # Maximum length of output.
 export TMUX_POWERLINE_SEG_PWD_MAX_LEN="40"
-# }
 
-# time.sh {
+
+# time.sh 
 # date(1) format for the time. Americans might want to have "%I:%M %p".
 export TMUX_POWERLINE_SEG_TIME_FORMAT="%H:%M"
 # Change this to display a different timezone than the system default.
 # Use TZ Identifier like "America/Los_Angeles"
 # export TMUX_POWERLINE_SEG_TIME_TZ=""
-# }
 
-# tmux_mem_cpu_load.sh {
+
+# tmux_mem_cpu_load.sh 
 # Arguments passed to tmux-mem-cpu-load.
 # See https://github.com/thewtex/tmux-mem-cpu-load for all available options.
 # export TMUX_POWERLINE_SEG_TMUX_MEM_CPU_LOAD_ARGS="-v"
-# }
 
-# tmux_session_info.sh {
+
+# tmux_session_info.sh 
 # Session info format to feed into the command: tmux display-message -p
 # For example, if FORMAT is '[ #S ]', the command is: tmux display-message -p '[ #S ]'
 export TMUX_POWERLINE_SEG_TMUX_SESSION_INFO_FORMAT="#S:#I.#P"
-# }
 
-# utc_time.sh {
+
+# utc_time.sh 
 # date(1) format for the UTC time.
 export TMUX_POWERLINE_SEG_UTC_TIME_FORMAT="%H:%M %Z"
-# }
 
-# vcs_branch.sh {
+
+# vcs_branch.sh 
 # Max length of the branch name.
 export TMUX_POWERLINE_SEG_VCS_BRANCH_MAX_LEN=""
 # Symbol when branch length exceeds max length
@@ -349,20 +349,20 @@ export TMUX_POWERLINE_SEG_VCS_BRANCH_MAX_LEN=""
 # Default branch symbol
 export TMUX_POWERLINE_SEG_VCS_BRANCH_DEFAULT_SYMBOL=""
 # Branch symbol for git repositories
-# export TMUX_POWERLINE_SEG_VCS_BRANCH_GIT_SYMBOL="${TMUX_POWERLINE_SEG_VCS_BRANCH_DEFAULT_SYMBOL}"
+# export TMUX_POWERLINE_SEG_VCS_BRANCH_GIT_SYMBOL="$TMUX_POWERLINE_SEG_VCS_BRANCH_DEFAULT_SYMBOL"
 # Branch symbol for hg/mercurial repositories
-# export TMUX_POWERLINE_SEG_VCS_BRANCH_HG_SYMBOL="${TMUX_POWERLINE_SEG_VCS_BRANCH_DEFAULT_SYMBOL}"
+# export TMUX_POWERLINE_SEG_VCS_BRANCH_HG_SYMBOL="$TMUX_POWERLINE_SEG_VCS_BRANCH_DEFAULT_SYMBOL"
 # Branch symbol for SVN repositories
-# export TMUX_POWERLINE_SEG_VCS_BRANCH_SVN_SYMBOL="${TMUX_POWERLINE_SEG_VCS_BRANCH_DEFAULT_SYMBOL}"
+# export TMUX_POWERLINE_SEG_VCS_BRANCH_SVN_SYMBOL="$TMUX_POWERLINE_SEG_VCS_BRANCH_DEFAULT_SYMBOL"
 # Branch symbol colour for git repositories
 export TMUX_POWERLINE_SEG_VCS_BRANCH_GIT_SYMBOL_COLOUR="5"
 # Branch symbol colour for hg/mercurial repositories
 export TMUX_POWERLINE_SEG_VCS_BRANCH_HG_SYMBOL_COLOUR="45"
 # Branch symbol colour for SVN repositories
 export TMUX_POWERLINE_SEG_VCS_BRANCH_SVN_SYMBOL_COLOUR="220"
-# }
 
-# vcs_compare.sh {
+
+# vcs_compare.sh 
 # Symbol if local branch is behind.
 # export TMUX_POWERLINE_SEG_VCS_COMPARE_AHEAD_SYMBOL="↑ "
 # Symbol colour if local branch is ahead. Defaults to "current segment foreground colour"
@@ -371,31 +371,31 @@ export TMUX_POWERLINE_SEG_VCS_BRANCH_SVN_SYMBOL_COLOUR="220"
 # export TMUX_POWERLINE_SEG_VCS_COMPARE_BEHIND_SYMBOL="↓ "
 # Symbol colour if local branch is behind. Defaults to "current segment foreground colour"
 # export TMUX_POWERLINE_SEG_VCS_COMPARE_BEHIND_SYMBOL_COLOUR=""
-# }
 
-# vcs_modified.sh {
+
+# vcs_modified.sh 
 # Symbol for count of modified vcs files.
 # export TMUX_POWERLINE_SEG_VCS_MODIFIED_SYMBOL="± "
-# }
 
-# vcs_others.sh {
+
+# vcs_others.sh 
 # Symbol for count of untracked vcs files.
 # export TMUX_POWERLINE_SEG_VCS_OTHERS_SYMBOL="⋯"
-# }
 
-# vcs_rootpath.sh {
+
+# vcs_rootpath.sh 
 # Display mode for vcs_rootpath.
 # Example: (name: folder name only; path: full path, w/o expansion; user_path: full path, w/ tilde expansion)
 # export TMUX_POWERLINE_SEG_VCS_ROOTPATH_MODE="name"
-# }
 
-# vcs_staged.sh {
+
+# vcs_staged.sh 
 # Symbol for count of staged vcs files.
 # export TMUX_POWERLINE_SEG_VCS_STAGED_SYMBOL="⊕ "
-# }
 
-# vpn.sh {
-# Mode for VPN segment {"both", "ip", "name"}. both: Show NIC/IP; ip: Show only IP; name: Show only NIC name
+
+# vpn.sh 
+# Mode for VPN segment "both", "ip", "name". both: Show NIC/IP; ip: Show only IP; name: Show only NIC name
 # export TMUX_POWERLINE_SEG_VPN_DISPLAY_MODE="both"
 # Space separated list of tunnel interface names. First match is being used. substring match, regexp can be used.
 # Examples:
@@ -410,19 +410,19 @@ export TMUX_POWERLINE_SEG_VCS_BRANCH_SVN_SYMBOL_COLOUR="220"
 # export TMUX_POWERLINE_SEG_VPN_SYMBOL_COLOUR="255"
 # Symbol for separator
 # export TMUX_POWERLINE_SEG_VPN_DISPLAY_SEPARATOR="󰿟"
-# }
 
-# wan_ip.sh {
+
+# wan_ip.sh 
 # Symbol for WAN IP
 # export TMUX_POWERLINE_SEG_WAN_IP_SYMBOL="ⓦ "
 # Symbol colour for WAN IP
 # export TMUX_POWERLINE_SEG_WAN_IP_SYMBOL_COLOUR="255"
-# }
 
-# weather.sh {
+
+# weather.sh 
 # The data provider to use. Currently only "yrno" is supported.
 export TMUX_POWERLINE_SEG_WEATHER_DATA_PROVIDER="yrno"
-# What unit to use. Can be any of {c,f,k}.
+# What unit to use. Can be any of c,f,k.
 export TMUX_POWERLINE_SEG_WEATHER_UNIT="c"
 # How often to update the weather in seconds.
 export TMUX_POWERLINE_SEG_WEATHER_UPDATE_PERIOD="600"
@@ -433,9 +433,9 @@ export TMUX_POWERLINE_SEG_WEATHER_LOCATION_UPDATE_PERIOD="86400"
 # Set both to "auto" to detect automatically based on your IP address, or set them manually
 export TMUX_POWERLINE_SEG_WEATHER_LAT="auto"
 export TMUX_POWERLINE_SEG_WEATHER_LON="auto"
-# }
 
-# xkb_layout.sh {
+
+# xkb_layout.sh 
 # Keyboard icon
 export TMUX_POWERLINE_SEG_XKB_LAYOUT_ICON="⌨ "
-# }
+

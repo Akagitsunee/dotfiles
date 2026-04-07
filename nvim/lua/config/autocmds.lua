@@ -38,7 +38,7 @@ autocmd('TextYankPost', {
     group = groups.ui_enhancements,
     desc = 'Highlight yanked text for visual feedback',
     callback = function()
-        vim.highlight.on_yank({
+        vim.hl.on_yank({
             higroup = 'IncSearch', -- Use search highlight color
             timeout = 300,         -- Brief flash - not distracting
         })
@@ -56,12 +56,27 @@ autocmd('CursorMoved', {
     end,
 })
 
+-- Quit Neovim if the only remaining window is nvim-tree.
+autocmd('BufEnter', {
+    group = groups.ui_enhancements,
+    pattern = 'NvimTree_*',
+    desc = 'Close Neovim when nvim-tree is the last remaining window',
+    callback = function()
+        local wins = vim.api.nvim_tabpage_list_wins(0)
+        if #wins == 1 and vim.bo.filetype == 'NvimTree' then
+            vim.schedule(function()
+                vim.cmd('confirm qall')
+            end)
+        end
+    end,
+})
+
 
 -- Make the TSContext the same color as the background
 local function set_treesitter_context_bg()
     local ok, normal = pcall(vim.api.nvim_get_hl, 0, { name = "Normal" })
-    if ok and normal and normal.bg then
-        vim.api.nvim_set_hl(0, "TreesitterContext", { bg = string.format("#%06x", normal.bg) })
+    if ok and normal and type(normal.bg) == "number" then
+        --vim.api.nvim_set_hl(0, "TreesitterContext", { bg = string.format("#%06x", normal.bg) })
     else
         vim.api.nvim_set_hl(0, "TreesitterContext", { bg = "NONE" })
     end
@@ -75,17 +90,6 @@ autocmd("ColorScheme", {
 
 -- ▶️ Also run immediately at startup (important!)
 vim.schedule(set_treesitter_context_bg)
-
--- Auto-resize splits when window is resized - maintains visual proportions
-autocmd('VimResized', {
-    group = groups.ui_enhancements,
-    desc = 'Auto-resize all splits to maintain proportions',
-    callback = function()
-        vim.schedule(function()
-            vim.cmd('wincmd =') -- Equalize all windows
-        end)
-    end,
-})
 
 -- Auto-close helper windows with 'q' - reduces cognitive overhead
 autocmd('FileType', {
@@ -111,19 +115,7 @@ autocmd('FileType', {
 -- 💾 FILE MANAGEMENT - Automatic saving and file handling
 -- ============================================================================
 
--- Auto-save on focus loss - prevents work loss during ADHD context switching
-autocmd({ 'FocusLost', 'BufLeave' }, {
-    group = groups.file_management,
-    desc = 'Auto-save modified files when losing focus (ADHD-friendly)',
-    callback = function()
-        -- Only save if auto_save is enabled and conditions are met
-        if _G.config and _G.config.behavior and _G.config.behavior.auto_save then
-            if vim.bo.modified and vim.fn.expand('%') ~= '' and not vim.bo.readonly then
-                pcall(vim.cmd.write) -- Safe save - won't error on read-only files
-            end
-        end
-    end,
-})
+-- Autosave is handled through Neovim's built-in autowrite/autowriteall path.
 
 -- Restore cursor position - return to where you were working
 autocmd('BufReadPost', {
@@ -146,7 +138,20 @@ autocmd('BufWritePre', {
     group = groups.file_management,
     desc = 'Create parent directories if they don\'t exist when saving',
     callback = function()
-        local dir = vim.fn.expand('<afile>:p:h')
+        if vim.bo.buftype ~= '' then
+            return
+        end
+
+        local file = vim.api.nvim_buf_get_name(0)
+        if file == '' or file:match('^%a+://') then
+            return
+        end
+
+        local dir = vim.fn.fnamemodify(file, ':p:h')
+        if dir == '' then
+            return
+        end
+
         if vim.fn.isdirectory(dir) == 0 then
             vim.fn.mkdir(dir, 'p')
         end
@@ -162,37 +167,56 @@ autocmd({ 'FocusGained', 'BufEnter', 'CursorHold' }, {
     end,
 })
 
--- ============================================================================
--- ✨ FORMATTING - Code quality and consistency
--- ============================================================================
+-- Auto-change directory to the project root (detects .git, package.json, etc.)
+-- This makes Neo-tree and Snacks automatically "zoom" into the current project folder!
+autocmd('BufEnter', {
+    group = groups.file_management,
+    desc = 'Auto-change CWD to project root',
+    callback = function(args)
+        -- Ignore special buffers (like neo-tree, help, terminals)
+        if vim.bo[args.buf].buftype ~= '' then return end
 
--- Format on save - uses global config setting
-autocmd('BufWritePre', {
-    group = groups.formatting,
-    desc = 'Format code on save (respects global format_on_save setting)',
-    callback = function()
-        if _G.config and _G.config.behavior and _G.config.behavior.format_on_save then
-            -- Try conform.nvim first, fallback to LSP formatting
-            local conform_ok, conform = pcall(require, 'conform')
-            if conform_ok then
-                conform.format({
-                    async = false,
-                    timeout_ms = 1000,
-                    lsp_fallback = true,
-                })
-            else
-                -- Fallback to LSP formatting
-                vim.lsp.buf.format({
-                    async = false,
-                    timeout_ms = 1000,
-                })
+        local path = vim.api.nvim_buf_get_name(args.buf)
+        if path == '' then
+            return
+        end
+
+        -- Find the root of the project using Neovim's native fs API.
+        -- Include config-friendly markers so repos like ~/.config/nvim don't stay anchored at ~.
+        local root = vim.fs.root(path, {
+            '.git',
+            'package.json',
+            'go.mod',
+            'Cargo.toml',
+            'Makefile',
+            'lazy-lock.json',
+            'stylua.toml',
+            '.stylua.toml',
+            'pyproject.toml',
+        })
+
+        -- Fallback for config folders without a VCS root, e.g. ~/.config/nvim/*
+        if not root then
+            local config_home = vim.fs.normalize(vim.fn.expand('~/.config'))
+            local normalized = vim.fs.normalize(path)
+            if vim.startswith(normalized, config_home .. '/') then
+                local rel = normalized:sub(#config_home + 2)
+                local top_level = rel:match('([^/]+)')
+                if top_level then
+                    root = config_home .. '/' .. top_level
+                end
             end
         end
 
-        -- Restore view to prevent folding collapse
-        restore_view()
+        if root and root ~= vim.fn.getcwd() then
+            vim.api.nvim_set_current_dir(root)
+        end
     end,
 })
+
+-- ============================================================================
+-- ✨ FORMATTING - Code quality and consistency
+-- ============================================================================
 
 -- Remove trailing whitespace for code files
 autocmd('BufWritePre', {
@@ -203,18 +227,6 @@ autocmd('BufWritePre', {
         local cursor_pos = vim.api.nvim_win_get_cursor(0)
         vim.cmd([[%s/\s\+$//e]])                          -- Remove trailing whitespace
         pcall(vim.api.nvim_win_set_cursor, 0, cursor_pos) -- Restore cursor
-    end,
-})
-
--- Auto-lint after changes (if nvim-lint is available)
-autocmd({ 'BufWritePost', 'BufReadPost', 'InsertLeave' }, {
-    group = groups.formatting,
-    desc = 'Run linting after file changes',
-    callback = function()
-        local lint_ok, lint = pcall(require, 'lint')
-        if lint_ok then
-            lint.try_lint()
-        end
     end,
 })
 
@@ -259,18 +271,6 @@ autocmd('BufWinEnter', {
     end,
 })
 
--- Show diagnostic float on cursor hold - contextual error information
-autocmd('CursorHold', {
-    group = groups.focus_management,
-    desc = 'Show diagnostic information when cursor is idle',
-    callback = function()
-        vim.diagnostic.open_float(nil, {
-            focusable = false,
-            border = _G.config and _G.config.ui and _G.config.ui.border or 'rounded'
-        })
-    end,
-})
-
 -- ============================================================================
 -- ⚡ PERFORMANCE OPTIMIZATIONS - Keep Neovim responsive
 -- ============================================================================
@@ -281,7 +281,7 @@ autocmd('BufReadPre', {
     desc = 'Optimize settings for large files (>1MB)',
     callback = function()
         local max_filesize = 1024 * 1024 -- 1MB threshold
-        local ok, stats = pcall(vim.loop.fs_stat, vim.api.nvim_buf_get_name(0))
+        local ok, stats = pcall(vim.uv.fs_stat, vim.api.nvim_buf_get_name(0))
 
         if ok and stats and stats.size > max_filesize then
             -- Disable expensive features for large files
@@ -344,19 +344,6 @@ autocmd('TermOpen', {
 -- ============================================================================
 -- 🚀 STARTUP AND CONFIGURATION MANAGEMENT
 -- ============================================================================
-
--- Reload configuration on save
-autocmd('BufWritePost', {
-    group = groups.general,
-    pattern = vim.fn.expand('$MYVIMRC'),
-    desc = 'Reload Neovim configuration when init.lua is saved',
-    callback = function()
-        vim.cmd('source $MYVIMRC')
-        vim.notify('Configuration reloaded!', vim.log.levels.INFO, {
-            title = 'Neovim Config'
-        })
-    end,
-})
 
 local reload_group = vim.api.nvim_create_augroup("ConfigHotReload", { clear = true })
 

@@ -8,7 +8,7 @@ return {
       'williamboman/mason-lspconfig.nvim',
       'nvimdev/lspsaga.nvim',
     },
-    config = function()
+    config = function(_, opts)
       vim.diagnostic.config {
         float = {
           source = false,
@@ -44,7 +44,6 @@ return {
         update_in_insert = false,
       }
 
-      local lspconfig = require 'lspconfig'
       local capabilities = require('blink.cmp').get_lsp_capabilities()
 
       -- Global override for floating preview border
@@ -54,14 +53,23 @@ return {
         opts.border = opts.border or _G.config.ui.border -- Use global border
         return orig_util_open_floating_preview(contents, syntax, opts, ...)
       end
+
+      local servers = opts.servers or {}
+      for server_name, server_opts in pairs(servers) do
+        server_opts.capabilities = vim.tbl_deep_extend('force', capabilities, server_opts.capabilities or {})
+        vim.lsp.config(server_name, server_opts)
+        vim.lsp.enable(server_name)
+      end
     end,
   },
   {
     'williamboman/mason-lspconfig.nvim',
+    lazy = true,
   },
   {
     'williamboman/mason.nvim',
     build = ':MasonUpdate',
+    cmd = 'Mason',
     config = function()
       require('mason').setup { ui = { border = _G.config.ui.border } }
       require('mason-lspconfig').setup {
@@ -70,17 +78,20 @@ return {
           'cssls',
           'graphql',
           'html',
+          'gopls',
+          'svelte',
           'jsonls',
           'lua_ls',
           -- 'prismals',
         },
-        automatic_installation = true,
+        automatic_enable = true,
       }
     end,
   },
   {
     'WhoIsSethDaniel/mason-tool-installer.nvim',
     dependencies = { 'williamboman/mason.nvim' },
+    event = 'VeryLazy',
     config = function()
       require('mason-tool-installer').setup {
         ensure_installed = {
@@ -91,6 +102,12 @@ return {
           'luacheck',
           'shellcheck',
           'shfmt',
+          'goimports',
+          'gofumpt',
+          'golangci-lint',
+          'markdownlint',
+          'yamllint',
+          'hadolint',
         },
         run_on_start = true,
         start_delay = 3000,
@@ -103,6 +120,7 @@ return {
     'nvimdev/lspsaga.nvim',
     event = 'LspAttach',
     config = function()
+      local colors = (_G.get_ui_colors and _G.get_ui_colors()) or _G.config.colors
       require('lspsaga').setup {
         -- 🎨 UI Configuration using global design system
         ui = {
@@ -111,16 +129,16 @@ return {
 
           -- Use global color system
           colors = {
-            normal_bg = vim.o.background == 'dark' and '#1a1b26' or '#ffffff',
-            title_bg = _G.config.colors.primary,
-            red = _G.config.colors.error,
-            magenta = _G.config.colors.secondary,
-            orange = _G.config.colors.warning,
-            yellow = _G.config.colors.warning,
-            green = _G.config.colors.success,
-            cyan = _G.config.colors.info,
-            blue = _G.config.colors.primary,
-            purple = _G.config.colors.secondary,
+            normal_bg = colors.panel,
+            title_bg = colors.primary,
+            red = colors.error,
+            magenta = colors.secondary,
+            orange = colors.warning,
+            yellow = colors.warning,
+            green = colors.success,
+            cyan = colors.info,
+            blue = colors.primary,
+            purple = colors.secondary,
           },
 
           -- Use global transparency settings
@@ -155,7 +173,7 @@ return {
 
         -- 🏷️ Symbol Outline (Great for ADHD - structural overview)
         symbol_in_winbar = {
-          enable = true,
+          enable = false,
           separator = _G.config.icons.ui.separator.standard,
           hide_keyword = true,
           show_file = true,
@@ -170,7 +188,7 @@ return {
           show_server_name = false,
           extend_gitsigns = true,
           keys = {
-            quit = 'q',
+            quit = { 'q', '<Esc>' },
             exec = '<CR>',
           },
         },
@@ -263,7 +281,7 @@ return {
         outline = {
           win_position = 'right', -- Consistent with your sidebar_width setting
           win_width = _G.config.layout.sidebar_width,
-          auto_preview = true,
+          auto_preview = false,
           auto_close = true,
           close_after_jump = false,
           layout = 'normal',
@@ -308,7 +326,7 @@ return {
       width = 50,
       mode = 'workspace_diagnostics',
       padding = true,
-      auto_preview = true,
+      auto_preview = false,
       use_diagnostic_signs = true,
       -- Use global design system
       signs = {
@@ -320,55 +338,51 @@ return {
     },
     keys = {
       {
-        "<leader>xx",
-        "<cmd>Trouble diagnostics toggle<cr>",
-        desc = "Diagnostics (Trouble)",
+        '<leader>xx',
+        '<cmd>Trouble diagnostics toggle<cr>',
+        desc = 'Diagnostics (Trouble)',
       },
       {
-        "<leader>xb",
-        "<cmd>Trouble diagnostics toggle filter.buf=0<cr>",
-        desc = "Buffer Diagnostics (Trouble)",
+        '<leader>xb',
+        '<cmd>Trouble diagnostics toggle filter.buf=0<cr>',
+        desc = 'Buffer Diagnostics (Trouble)',
       },
       {
-        "<leader>xs",
-        "<cmd>Trouble symbols toggle focus=false<cr>",
-        desc = "Symbols (Trouble)",
+        '<leader>xL',
+        '<cmd>Trouble loclist toggle<cr>',
+        desc = 'Location List (Trouble)',
       },
       {
-        "<leader>xl",
-        "<cmd>Trouble lsp toggle focus=false win.position=right<cr>",
-        desc = "LSP Definitions / references / ... (Trouble)",
-      },
-      {
-        "<leader>xL",
-        "<cmd>Trouble loclist toggle<cr>",
-        desc = "Location List (Trouble)",
-      },
-      {
-        "<leader>xQ",
-        "<cmd>Trouble qflist toggle<cr>",
-        desc = "Quickfix List (Trouble)",
+        '<leader>xQ',
+        '<cmd>Trouble qflist toggle<cr>',
+        desc = 'Quickfix List (Trouble)',
       },
     },
     specs = {
-      "folke/snacks.nvim",
-      opts = function(_, opts)
-        return vim.tbl_deep_extend("force", opts or {}, {
-          picker = {
-            actions = require("trouble.sources.snacks").actions,
-            win = {
-              input = {
-                keys = {
-                  ["<c-t>"] = {
-                    "trouble_open",
-                    mode = { "n", "i" },
+      {
+        'folke/snacks.nvim',
+        opts = function(_, opts)
+          return vim.tbl_deep_extend('force', opts or {}, {
+            picker = {
+              actions = {
+                trouble_open = function(...)
+                  return require('trouble.sources.snacks').actions.trouble_open(...)
+                end,
+              },
+              win = {
+                input = {
+                  keys = {
+                    ['<c-t>'] = {
+                      'trouble_open',
+                      mode = { 'n', 'i' },
+                    },
                   },
                 },
               },
             },
-          },
-        })
-      end,
+          })
+        end,
+      },
     },
   },
 }

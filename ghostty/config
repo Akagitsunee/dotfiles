@@ -1,0 +1,169 @@
+# Ghostty Configuration
+# Location: ~/.config/ghostty/config (Linux/macOS XDG)
+#           ~/Library/Application Support/com.mitchellh.ghostty/config (macOS)
+
+# ============================================================================
+# GENERAL CONFIGURATION
+# ============================================================================
+# Icon Config
+macos-icon = custom  
+macos-custom-icon = ~/.config/ghostty/Ghostty.icns
+command = /bin/zsh -c "tmux attach || tmux"
+
+# ============================================================================
+# FONT CONFIGURATION
+# ============================================================================
+# Ghostty uses font-family for the main font, with automatic fallbacks
+font-family = JetBrainsMono Nerd Font
+# font-style = Medium
+font-size = 14
+font-feature = calt
+font-feature = liga
+
+# Additional font options
+font-thicken = true
+font-thicken-strength = 100
+window-colorspace = display-p3
+# adjust-cell-height = 5  # Uncomment to increase line height (pixels or % like 35%)
+# Note: Ghostty's default line spacing is generally good, adjust only if needed
+
+# ============================================================================
+# COLORS - Custom Dark Theme
+# ============================================================================
+# Replicating your custom WezTerm "dark" color scheme
+
+background = 222836
+foreground = ffffff
+
+# Cursor colors
+cursor-color = ffffff
+cursor-text = 16181a
+
+# Selection colors  
+selection-background = 5eff6c
+selection-foreground = 16181a
+
+# ANSI Colors (0-7: normal colors)
+palette = 0=#16181a
+palette = 1=#ff5ea0
+palette = 2=#5eff6c
+palette = 3=#ffbd5e
+palette = 4=#5ea1ff
+palette = 5=#bd5eff
+palette = 6=#5ef1ff
+palette = 7=#ffffff
+
+# Bright colors (8-15)
+palette = 8=#16181a
+palette = 9=#ff5ea0
+palette = 10=#5eff6c
+palette = 11=#ffbd5e
+palette = 12=#5ea1ff
+palette = 13=#bd5eff
+palette = 14=#5ef1ff
+palette = 15=#ffffff
+
+# Extended colors
+palette = 16=#d17c00
+palette = 17=#d11500
+
+# ============================================================================
+# CURSOR
+# ============================================================================
+cursor-style = bar
+cursor-style-blink = false
+
+# ============================================================================
+# WINDOW CONFIGURATION
+# ============================================================================
+# Initial window size (rows x columns)
+window-height = 40 
+window-width = 190
+
+# Center the terminal in the center
+# config-file = config-1080p  
+
+# Cell width and height
+#adjust-cell-width = 
+adjust-cell-height = 35% 
+
+# Window decorations - for macOS, use macos-titlebar-style instead
+# Options: transparent (default), native, tabs, hidden
+# - transparent: titlebar with custom bg color showing through (draggable normally)
+# - hidden: hides titlebar but keeps window frame (use Option+click to drag)
+# - native: standard macOS titlebar
+macos-titlebar-style = hidden
+
+# For Linux, use window-decoration instead:
+# window-decoration = auto  # Options: auto, client, server, none
+
+# Window padding (your config had all zeros)
+window-padding-x = 0
+window-padding-y = 0
+window-padding-balance = true
+
+# Background opacity
+background-opacity = 0.96
+background-blur = true
+
+# Optional: Uncomment for blur effect (macOS/Linux Wayland)
+# macos-option-as-alt = true
+# background-blur-radius = 20
+
+# Save window state 
+window-save-state = always
+
+# ============================================================================
+# TABS
+# ============================================================================
+window-theme = ghostty
+
+# ============================================================================
+# BEHAVIOR
+# ============================================================================
+# Config auto-reloads on save by default
+# Manual reload: Cmd+Shift+, (macOS) or Ctrl+Shift+, (Linux)
+
+# Close confirmation
+confirm-close-surface = false
+
+# Shell integration
+shell-integration = detect
+shell-integration-features = cursor,sudo,title
+
+# ============================================================================
+# KEYBINDINGS
+# ============================================================================
+# Font size controls
+keybind = ctrl+equal=increase_font_size:1
+keybind = ctrl+minus=decrease_font_size:1
+keybind = ctrl+0=reset_font_size
+
+# Note: Your "toggle-font" custom event can't be directly ported
+# You would need to use multiple config files and switch between them
+
+# ============================================================================
+# HYPERLINKS
+# ============================================================================
+# Ghostty has excellent hyperlink detection built-in
+# Your regex patterns are mostly covered by defaults
+# Additional custom patterns can be added if needed
+
+link-url = true
+
+# ============================================================================
+# THEME SWITCHING (Optional)
+# ============================================================================
+# Uncomment if you want to use built-in themes instead of custom colors
+# To see all available themes: ghostty +list-themes
+
+# theme = Catppuccin Mocha
+# theme = light:Catppuccin Latte,dark:Catppuccin Mocha  # Auto-switch
+
+# ============================================================================
+# PERFORMANCE
+# ============================================================================
+# Ghostty is optimized by default, but here are some options:
+# clipboard-trim-trailing-spaces = false
+# clipboard-paste-bracketed-safe = true
+

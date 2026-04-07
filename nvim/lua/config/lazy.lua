@@ -29,7 +29,7 @@ require("lazy").setup({
         { import = "plugins.core" },      -- Essential functionality
         { import = "plugins.editor" },    -- Text manipulation
         { import = "plugins.tools" },     -- Specialized utilities
-        { import = "plugins.languages" }, -- Language-specific tools
+        require("plugins.languages"),      -- Language-specific tools
         { import = "plugins.ui" },        -- Visual interface
     },
 
@@ -42,7 +42,7 @@ require("lazy").setup({
     -- Installation settings
     install = {
         missing = true,                          -- Install missing plugins on startup
-        colorscheme = { "nightfox", "habamax" }, -- Try these colorschemes during install
+        colorscheme = { "onedark", "habamax" }, -- Try these colorschemes during install
     },
 
     -- UI Configuration - matches your global design system

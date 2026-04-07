@@ -1,13 +1,16 @@
 return {
   'saghen/blink.cmp',
   event = 'InsertEnter',
+  lazy = true,
   build = 'cargo build --release',
 
   dependencies = {
     -- Snippet Engine
     {
       'L3MON4D3/LuaSnip',
+      event = "InsertEnter",
       version = '2.*',
+      lazy = true,
       build = "make install_jsregexp",
 
       dependencies = { 'rafamadriz/friendly-snippets' },
@@ -16,18 +19,20 @@ return {
         require("luasnip.loaders.from_vscode").lazy_load()
       end,
     },
-    {
-      'fang2hou/blink-copilot',
-      event = 'InsertEnter'
-    },
+    -- {
+    --   'fang2hou/blink-copilot',
+    --   event = 'InsertEnter'
+    -- },
     {
       'folke/lazydev.nvim',
-      event = 'InsertEnter'
+      event = 'InsertEnter',
+      lazy = true,
     },
     -- Add blink.pairs for autopair functionality
     {
       'saghen/blink.pairs',
       event = 'InsertEnter',
+      lazy = true,
       build = 'cargo build --release'
     },
   },
@@ -65,7 +70,7 @@ return {
         },
       },
       highlights = {
-        enabled = true,
+        enabled = false, -- Disabled: Experimental watcher causes startup crashes
         groups = {
           'BlinkPairsOrange',
           'BlinkPairsPurple',
@@ -100,29 +105,29 @@ return {
     },
 
     sources = {
-      default = { 'lsp', 'path', 'snippets', 'buffer', 'lazydev', 'copilot' },
+      default = { 'lsp', 'path', 'snippets', 'buffer', 'lazydev' },
       providers = {
         lazydev = { module = 'lazydev.integrations.blink', score_offset = 100 },
 
-        copilot = {
-          name = "copilot",
-          module = "blink-copilot",
-          opts = {
-            max_completions = 3,
-            max_attempts = 4,
-          },
-          score_offset = 100,
-          async = true,
-          transform_items = function(_, items)
-            local CompletionItemKind = require("blink.cmp.types").CompletionItemKind
-            local kind_idx = #CompletionItemKind + 1
-            CompletionItemKind[kind_idx] = "Copilot"
-            for _, item in ipairs(items) do
-              item.kind = kind_idx
-            end
-            return items
-          end,
-        },
+        --copilot = {
+        --  name = "copilot",
+        --  module = "blink-copilot",
+        --  opts = {
+        --    max_completions = 3,
+        --    max_attempts = 4,
+        --  },
+        --  score_offset = 100,
+        --  async = true,
+        --  transform_items = function(_, items)
+        --    local CompletionItemKind = require("blink.cmp.types").CompletionItemKind
+        --    local kind_idx = #CompletionItemKind + 1
+        --    CompletionItemKind[kind_idx] = "Copilot"
+        --    for _, item in ipairs(items) do
+        --      item.kind = kind_idx
+        --    end
+        --    return items
+        --  end,
+        --},
 
         buffer = {
           name = "buffer",

@@ -3,17 +3,28 @@ return {
     {
         'kevinhwang91/nvim-ufo',
         dependencies = 'kevinhwang91/promise-async',
-        event = "VimEnter",
+        event = { "BufReadPost", "BufNewFile" },
         config = function()
             local ufo_utils = require("utils.ufo")
             require('ufo').setup({
                 fold_virt_text_handler = ufo_utils.handler,
                 open_fold_hl_timeout = 0,
+                close_fold_kinds_for_ft = {
+                    default = {},
+                    lua = {},
+                    python = { 'imports' },
+                    javascript = { 'imports' },
+                    typescript = { 'imports' },
+                    javascriptreact = { 'imports' },
+                    typescriptreact = { 'imports' },
+                    go = { 'imports' },
+                    rust = { 'imports' },
+                },
                 provider_selector = function(bufnr, filetype, buftype)
-                    -- Only apply folding to actual code files
+                    -- Only apply folding to actual code files with solid treesitter support.
                     local code_filetypes = {
                         'lua', 'python', 'javascript', 'typescript', 'javascriptreact',
-                        'typescriptreact', 'go', 'rust', 'java', 'c', 'cpp', 'html', 'css'
+                        'typescriptreact', 'go', 'rust', 'java', 'c', 'cpp'
                     }
 
                     -- Skip special buffers (dashboards, help, etc.)
@@ -29,42 +40,11 @@ return {
                     -- Only fold actual code files
                     for _, ft in ipairs(code_filetypes) do
                         if filetype == ft then
-                            return { 'treesitter', 'indent' }
+                            return { 'treesitter' }
                         end
                     end
 
                     return ''
-                end,
-            })
-
-            -- Utility: Open all folds + restore cursor position
-            local function restore_view()
-                local view = vim.fn.winsaveview()
-                vim.defer_fn(function()
-                    vim.fn.winrestview(view)
-                    vim.cmd("normal! zR") -- Open all folds
-                end, 20)
-            end
-
-            -- On LSP attach: prevent folding collapse
-            vim.api.nvim_create_autocmd("LspAttach", {
-                callback = function()
-                    restore_view()
-                end,
-            })
-
-            -- On save: prevent folding collapse
-            vim.api.nvim_create_autocmd("BufWritePost", {
-                callback = function()
-                    restore_view()
-                end,
-            })
-
-            -- On code action: prevent folding collapse
-            vim.api.nvim_create_autocmd("User", {
-                pattern = "LspCodeAction",
-                callback = function()
-                    restore_view()
                 end,
             })
         end,
@@ -72,6 +52,7 @@ return {
     -- Colorizer
     {
         "brenoprata10/nvim-highlight-colors",
+        event = "BufReadPost",
         opts = {
             enable_tailwind = false,
         }
@@ -82,21 +63,25 @@ return {
         event = { "BufReadPost", "BufNewFile" },
         opts = {
             indent = {
-                char = "┆",
-                tab_char = "┆",
+                char = "│",
+                tab_char = "│",
+                highlight = "IblChar",
             },
             scope = {
-                enabled = true,
-                show_start = true,
+                enabled = false,
+                show_start = false,
                 show_end = false,
-                highlight = { "Function", "Label" },
+                highlight = "IblScopeChar",
+            },
+            whitespace = {
+                remove_blankline_trail = true,
             },
             exclude = {
                 filetypes = {
                     "help",
                     "alpha",
                     "dashboard",
-                    "neo-tree",
+                    "NvimTree",
                     "Trouble",
                     "trouble",
                     "lazy",

@@ -1,8 +1,4 @@
-vim.api.nvim_create_autocmd('FileType', {
-  pattern = 'javascript',
-  callback = function()
-    vim.opt_local.shiftwidth = 2
-    vim.opt_local.tabstop = 2
-    vim.opt_local.softtabstop = 2
-  end,
-})
+-- This file is automatically executed by Neovim ONLY for javascript files.
+vim.opt_local.shiftwidth = 2
+vim.opt_local.tabstop = 2
+vim.opt_local.softtabstop = 2

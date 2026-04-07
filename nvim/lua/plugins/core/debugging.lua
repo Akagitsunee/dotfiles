@@ -8,6 +8,7 @@ return {
     -- Main DAP plugin with comprehensive debugging support
     {
         "mfussenegger/nvim-dap",
+        lazy = true,
         dependencies = {
             "theHamsta/nvim-dap-virtual-text",
             "nvim-neotest/nvim-nio",
@@ -19,11 +20,6 @@ return {
                     "mfussenegger/nvim-dap",
                     "nvim-treesitter/nvim-treesitter",
                 },
-                build = function()
-                    if not require("nvim-treesitter.parsers").has_parser("dap_repl") then
-                        vim.cmd(":TSInstall dap_repl")
-                    end
-                end,
             },
         },
         config = function()
@@ -106,16 +102,7 @@ return {
             -- ╰──────────────────────────────────────────────────────────╯
             dap.set_log_level("TRACE")
 
-            -- Auto-open/close UI for seamless debugging experience
-            dap.listeners.before.attach["dapui_config"] = function()
-                dapui.open()
-            end
-            dap.listeners.before.launch["dapui_config"] = function()
-                dapui.open()
-            end
-            dap.listeners.after.event_initialized["dapui_config"] = function()
-                dapui.open()
-            end
+            -- Keep the debugging UI manual-first to avoid fighting the tree/trouble layout.
             dap.listeners.before.event_terminated["dapui_config"] = function()
                 dapui.close()
             end

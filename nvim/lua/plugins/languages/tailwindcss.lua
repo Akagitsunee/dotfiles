@@ -3,27 +3,25 @@ return {
     "neovim/nvim-lspconfig",
     -- The filetypes are moved to the top-level ft key for lazy-loading
     ft = { "html", "mdx", "javascript", "typescript", "javascriptreact", "typescriptreact", "vue", "svelte" }, --
-    opts = {
-      servers = {
+    opts = function(_, opts)
+      local capabilities = require("blink.cmp").get_lsp_capabilities()
+      capabilities.textDocument.completion.completionItem.snippetSupport = true
+      capabilities.textDocument.colorProvider = { dynamicRegistration = false }
+      capabilities.textDocument.foldingRange = {
+        dynamicRegistration = false,
+        lineFoldingOnly = true,
+      }
+
+      opts.servers = vim.tbl_deep_extend("force", opts.servers or {}, {
         tailwindcss = {
-          -- All the original keys are now nested inside the server config
-          capabilities = (function() --
-            local capabilities = require("blink.cmp").get_lsp_capabilities()
-            capabilities.textDocument.completion.completionItem.snippetSupport = true
-            capabilities.textDocument.colorProvider = { dynamicRegistration = false }
-            capabilities.textDocument.foldingRange = {
-              dynamicRegistration = false,
-              lineFoldingOnly = true,
-            }
-            return capabilities
-          end)(),
-          init_options = { --
+          capabilities = capabilities,
+          init_options = {
             userLanguages = {
               eelixir = "html-eex",
               eruby = "erb",
             },
           },
-          settings = { --
+          settings = {
             tailwindCSS = {
               validate = true,
               lint = {
@@ -49,7 +47,7 @@ return {
             },
           },
         },
-      },
-    },
+      })
+    end,
   },
 }

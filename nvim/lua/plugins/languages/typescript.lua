@@ -14,12 +14,6 @@ return {
 
             -- Custom handlers using global config
             local handlers = {
-                ["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, {
-                    border = _G.config.ui.border
-                }),
-                ["textDocument/signatureHelp"] = vim.lsp.with(vim.lsp.handlers.signature_help, {
-                    border = _G.config.ui.border
-                }),
                 ["textDocument/definition"] = function(err, result, method, ...)
                     if vim.tbl_islist(result) and #result > 1 then
                         local filtered_result = utils.filter(result, utils.filterReactDTS)

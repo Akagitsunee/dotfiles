@@ -1,6 +1,6 @@
 local keymap = vim.keymap.set
 local opts = { noremap = true, silent = true }
-local Snacks = require("snacks")
+local snacks_ok, Snacks = pcall(require, "snacks")
 
 -- Helper function to merge opts with desc
 local function desc_opts(description, extra_opts)
@@ -9,6 +9,25 @@ local function desc_opts(description, extra_opts)
         merged = vim.tbl_extend("force", merged, extra_opts)
     end
     return merged
+end
+
+local function safe_require(mod)
+    local ok, module = pcall(require, mod)
+    if ok then
+        return module
+    end
+
+    vim.notify(("Module not available: %s"):format(mod), vim.log.levels.WARN)
+    return nil
+end
+
+local function with_module(mod, cb)
+    return function(...)
+        local module = safe_require(mod)
+        if module then
+            return cb(module, ...)
+        end
+    end
 end
 
 -- ╭─────────────────────────────────────────────────────────╮
@@ -74,8 +93,9 @@ keymap("n", "N", "Nzzzv", desc_opts("Previous search result centered"))
 -- Helper function to safely call gitsigns functions
 local function gitsigns_action(action)
     return function()
-        if _G.gitsigns then
-            return _G.gitsigns[action]()
+        local ok, gitsigns = pcall(require, "gitsigns")
+        if ok then
+            return gitsigns[action]()
         else
             vim.notify("Gitsigns not loaded", vim.log.levels.WARN)
         end
@@ -105,14 +125,16 @@ keymap('n', '<leader>gr', gitsigns_action('reset_hunk'), desc_opts("Reset hunk")
 
 -- Visual mode staging/resetting
 keymap('v', '<leader>gs', function()
-    if _G.gitsigns then
-        _G.gitsigns.stage_hunk({ vim.fn.line('.'), vim.fn.line('v') })
+    local ok, gitsigns = pcall(require, "gitsigns")
+    if ok then
+        gitsigns.stage_hunk({ vim.fn.line('.'), vim.fn.line('v') })
     end
 end, desc_opts("Stage hunk (visual)"))
 
 keymap('v', '<leader>gr', function()
-    if _G.gitsigns then
-        _G.gitsigns.reset_hunk({ vim.fn.line('.'), vim.fn.line('v') })
+    local ok, gitsigns = pcall(require, "gitsigns")
+    if ok then
+        gitsigns.reset_hunk({ vim.fn.line('.'), vim.fn.line('v') })
     end
 end, desc_opts("Reset hunk (visual)"))
 
@@ -124,8 +146,9 @@ keymap('n', '<leader>gR', gitsigns_action('reset_buffer'), desc_opts("Reset enti
 -- Preview and blame
 keymap('n', '<leader>gp', gitsigns_action('preview_hunk'), desc_opts("Preview hunk"))
 keymap('n', '<leader>gb', function()
-    if _G.gitsigns then
-        _G.gitsigns.blame_line({ full = true })
+    local ok, gitsigns = pcall(require, "gitsigns")
+    if ok then
+        gitsigns.blame_line({ full = true })
     end
 end, desc_opts("Blame line (full)"))
 keymap('n', '<leader>gB', gitsigns_action('toggle_current_line_blame'), desc_opts("Toggle line blame"))
@@ -133,8 +156,9 @@ keymap('n', '<leader>gB', gitsigns_action('toggle_current_line_blame'), desc_opt
 -- Diff operations
 keymap('n', '<leader>gd', gitsigns_action('diffthis'), desc_opts("Diff this"))
 keymap('n', '<leader>gD', function()
-    if _G.gitsigns then
-        _G.gitsigns.diffthis('~')
+    local ok, gitsigns = pcall(require, "gitsigns")
+    if ok then
+        gitsigns.diffthis('~')
     end
 end, desc_opts("Diff this (cached)"))
 
@@ -181,7 +205,7 @@ keymap('n', 'gR', '<cmd>Lspsaga finder ref<CR>', desc_opts("Find references only
 keymap('n', 'gi', '<cmd>Lspsaga finder imp<CR>', desc_opts("Find implementations"))
 
 -- 📋 Outline & Structure
-keymap('n', '<leader>co', '<cmd>Lspsaga outline<CR>', desc_opts("Show document outline"))
+keymap('n', '<leader>co', '<cmd>Trouble symbols toggle focus=false<CR>', desc_opts("Toggle symbols outline"))
 
 -- 📞 Call Hierarchy
 keymap('n', '<leader>ch', '<cmd>Lspsaga incoming_calls<CR>', desc_opts("Show incoming calls"))
@@ -194,28 +218,9 @@ keymap('n', '<leader>cH', '<cmd>Lspsaga outgoing_calls<CR>', desc_opts("Show out
 -- Toggle format on save
 keymap("n", "<leader>cF", "<cmd>FormatToggle<cr>", desc_opts("Toggle format on save"))
 
-keymap({ "n", "v" }, "<leader>cf", function()
-    -- This will be available after conform.nvim loads
-    local conform_ok, conform = pcall(require, "conform")
-    if conform_ok then
-        conform.format({
-            timeout_ms = 1000,
-            lsp_fallback = true,
-        })
-    else
-        -- Fallback to LSP formatting if conform isn't loaded yet
-        vim.lsp.buf.format({ async = true })
-    end
-end, desc_opts("Format buffer/selection"))
+keymap({ "n", "v" }, "<leader>cf", "<cmd>Format<cr>", desc_opts("Format buffer/selection"))
 
-keymap("n", "<leader>cl", function()
-    local lint_ok, lint = pcall(require, "lint")
-    if lint_ok then
-        lint.try_lint()
-    else
-        require("notify")("nvim-lint not loaded", "warn")
-    end
-end, desc_opts("Lint current buffer"))
+keymap("n", "<leader>cl", "<cmd>LintBuffer<cr>", desc_opts("Lint current buffer"))
 
 -- Show linter info for current filetype
 keymap("n", "<leader>cL", "<cmd>LintInfo<cr>", desc_opts("Show linter info"))
@@ -225,20 +230,31 @@ keymap("n", "<leader>cL", "<cmd>LintInfo<cr>", desc_opts("Show linter info"))
 -- =============================================================================
 -- File explorer (Oil.nvim)
 keymap("n", "<leader>e", ":Oil<CR>", desc_opts("Open Oil file explorer"))
+keymap("n", "<leader>E", function()
+    local api = safe_require("nvim-tree.api")
+    if not api then
+        return
+    end
+    api.tree.toggle({
+        find_file = true,
+        focus = true,
+        update_root = true,
+    })
+end, desc_opts("Toggle Explorer Map"))
 
 -- =============================================================================
 -- 🔭 Snacks Picker (Fuzzy Finding)
 -- =============================================================================
 
 -- File Operation
-keymap("n", "<leader>ff", function() Snacks.picker.files() end, desc_opts("Find files"))
-keymap("n", "<leader>fg", function() Snacks.picker.grep() end, desc_opts("Find (Grep) in files"))
-keymap("n", "<leader>fb", function() Snacks.picker.buffers() end, desc_opts("Find buffers"))
-keymap("n", "<leader>fh", function() Snacks.picker.help() end, desc_opts("Find help"))
-keymap("n", "<leader>fk", function() Snacks.picker.keymaps() end, desc_opts("Find keymaps"))
-keymap("n", "<leader>fr", function() Snacks.picker.oldfiles() end, desc_opts("Recent files"))
-keymap("n", "<leader>fc", function() Snacks.picker.commands() end, desc_opts("Command palette"))
-keymap("n", "<leader>fw", function() Snacks.picker.grep_word() end, desc_opts("Live grep string"))
+keymap("n", "<leader>ff", function() if snacks_ok then Snacks.picker.files() else vim.notify("snacks.nvim not loaded", vim.log.levels.WARN) end end, desc_opts("Find files"))
+keymap("n", "<leader>fg", function() if snacks_ok then Snacks.picker.grep() else vim.notify("snacks.nvim not loaded", vim.log.levels.WARN) end end, desc_opts("Find (Grep) in files"))
+keymap("n", "<leader>fb", function() if snacks_ok then Snacks.picker.buffers() else vim.notify("snacks.nvim not loaded", vim.log.levels.WARN) end end, desc_opts("Find buffers"))
+keymap("n", "<leader>fh", function() if snacks_ok then Snacks.picker.help() else vim.notify("snacks.nvim not loaded", vim.log.levels.WARN) end end, desc_opts("Find help"))
+keymap("n", "<leader>fk", function() if snacks_ok then Snacks.picker.keymaps() else vim.notify("snacks.nvim not loaded", vim.log.levels.WARN) end end, desc_opts("Find keymaps"))
+keymap("n", "<leader>fr", function() if snacks_ok then Snacks.picker.oldfiles() else vim.notify("snacks.nvim not loaded", vim.log.levels.WARN) end end, desc_opts("Recent files"))
+keymap("n", "<leader>fc", function() if snacks_ok then Snacks.picker.commands() else vim.notify("snacks.nvim not loaded", vim.log.levels.WARN) end end, desc_opts("Command palette"))
+keymap("n", "<leader>fw", function() if snacks_ok then Snacks.picker.grep_word() else vim.notify("snacks.nvim not loaded", vim.log.levels.WARN) end end, desc_opts("Live grep string"))
 
 -- ========================================
 -- ⚡ FLASH NAVIGATION KEYMAPS
@@ -246,30 +262,45 @@ keymap("n", "<leader>fw", function() Snacks.picker.grep_word() end, desc_opts("L
 
 -- Flash jump keymaps (lazy loaded)
 keymap({ "n", "x", "o" }, "s", function()
-    require("flash").jump()
+    local flash = safe_require("flash")
+    if flash then
+        flash.jump()
+    end
 end, desc_opts("Flash Jump"))
 
 keymap({ "n", "x", "o" }, "S", function()
-    require("flash").treesitter()
+    local flash = safe_require("flash")
+    if flash then
+        flash.treesitter()
+    end
 end, desc_opts("Flash Treesitter"))
 
 keymap("o", "r", function()
-    require("flash").remote()
+    local flash = safe_require("flash")
+    if flash then
+        flash.remote()
+    end
 end, desc_opts("Remote Flash"))
 
 keymap({ "o", "x" }, "R", function()
-    require("flash").treesitter_search()
+    local flash = safe_require("flash")
+    if flash then
+        flash.treesitter_search()
+    end
 end, desc_opts("Treesitter Search"))
 
 keymap("c", "<c-s>", function()
-    require("flash").toggle()
+    local flash = safe_require("flash")
+    if flash then
+        flash.toggle()
+    end
 end, desc_opts("Toggle Flash Search"))
 
 -- =============================================================================
 -- 🌈 THEME SWITCHING
 -- =============================================================================
 
-keymap("n", "<leader>uc", function() require("snacks").picker.colorschemes() end, desc_opts("Toggle color scheme"))
+keymap("n", "<leader>uc", function() _G.pick_base46_theme() end, desc_opts("Pick base46 theme"))
 
 -- =============================================================================
 -- 🌈 UI toggles
@@ -299,69 +330,59 @@ local signs = {
     },
 }
 
-keymap('n', '<leader>ue', function()
-    local diagnostic_virtual_text_enabled = vim.diagnostic.config().virtual_text
-    if not diagnostic_virtual_text_enabled then
-        -- Enable only ESLint diagnostics
-        vim.diagnostic.config({
-            virtual_text = true,
-            signs = signs,
-            underline = true,
-            update_in_insert = false,
-            severity_sort = true,
-        })
-    else
-        -- Disable all diagnostics
-        vim.diagnostic.config({
-            virtual_text = false,
-            signs = signs,
-            underline = false,
-            update_in_insert = false,
-            severity_sort = false,
-        })
-    end
-end, desc_opts("Toggle ESLint Diagnostics"))
+keymap('n', '<leader>ud', function()
+    local current = vim.diagnostic.config()
+    local enabled = current.virtual_text
+
+    vim.diagnostic.config({
+        virtual_text = not enabled,
+        signs = signs,
+        underline = current.underline,
+        update_in_insert = current.update_in_insert,
+        severity_sort = current.severity_sort,
+    })
+end, desc_opts("Toggle inline diagnostics"))
 
 -- =============================================================================
 -- 🤖 COPILOT CHAT
 -- =============================================================================
 
-keymap("n", "<leader>ac", ":CopilotChat<CR>", desc_opts("Chat with Copilot"))
-keymap("n", "<leader>ae", ":CopilotChatExplain<CR>", desc_opts("Explain code with Copilot"))
-keymap("n", "<leader>at", ":CopilotChatTests<CR>", desc_opts("Generate tests with Copilot"))
-keymap("n", "<leader>ar", ":CopilotChatReview<CR>", desc_opts("Review code with Copilot"))
-keymap("n", "<leader>af", ":CopilotChatFixDiagnostic<CR>", desc_opts("Fix diagnostics with Copilot"))
-keymap("n", "<leader>am", ":CopilotChatCommit<CR>", desc_opts("Generate commit message"))
+-- keymap("n", "<leader>ac", ":CopilotChat<CR>", desc_opts("Chat with Copilot"))
+-- keymap("n", "<leader>ae", ":CopilotChatExplain<CR>", desc_opts("Explain code with Copilot"))
+-- keymap("n", "<leader>at", ":CopilotChatTests<CR>", desc_opts("Generate tests with Copilot"))
+-- keymap("n", "<leader>ar", ":CopilotChatReview<CR>", desc_opts("Review code with Copilot"))
+-- keymap("n", "<leader>af", ":CopilotChatFixDiagnostic<CR>", desc_opts("Fix diagnostics with Copilot"))
+-- keymap("n", "<leader>am", ":CopilotChatCommit<CR>", desc_opts("Generate commit message"))
 
 -- =============================================================================
 -- 🐛 DEBUGGING (DAP)
 -- =============================================================================
 -- ▶️ Core debugging controls
-keymap("n", "<Leader>dc", "<Cmd>lua require('dap').continue()<CR>", desc_opts("Debug: Continue"))
-keymap("n", "<Leader>dt", "<Cmd>lua require('dap').terminate()<CR>", desc_opts("Debug: Terminate"))
+keymap("n", "<Leader>dc", with_module('dap', function(dap) dap.continue() end), desc_opts("Debug: Continue"))
+keymap("n", "<Leader>dt", with_module('dap', function(dap) dap.terminate() end), desc_opts("Debug: Terminate"))
 
 -- 🛑 Breakpoint management
-keymap("n", "<Leader>db", "<Cmd>lua require('dap').toggle_breakpoint()<CR>", desc_opts("Debug: Toggle Breakpoint"))
-keymap("n", "<Leader>dB", "<Cmd>lua require('dap').set_breakpoint(vim.fn.input('Breakpoint condition: '))<CR>",
+keymap("n", "<Leader>db", with_module('dap', function(dap) dap.toggle_breakpoint() end), desc_opts("Debug: Toggle Breakpoint"))
+keymap("n", "<Leader>dB", with_module('dap', function(dap) dap.set_breakpoint(vim.fn.input('Breakpoint condition: ')) end),
     desc_opts("Debug: Conditional Breakpoint"))
 
 -- 🪜 Step controls
-keymap("n", "<Leader>di", "<Cmd>lua require('dap').step_into()<CR>", desc_opts("Debug: Step Into"))
-keymap("n", "<Leader>do", "<Cmd>lua require('dap').step_out()<CR>", desc_opts("Debug: Step Out"))
-keymap("n", "<Leader>dO", "<Cmd>lua require('dap').step_over()<CR>", desc_opts("Debug: Step Over"))
+keymap("n", "<Leader>di", with_module('dap', function(dap) dap.step_into() end), desc_opts("Debug: Step Into"))
+keymap("n", "<Leader>do", with_module('dap', function(dap) dap.step_out() end), desc_opts("Debug: Step Out"))
+keymap("n", "<Leader>dO", with_module('dap', function(dap) dap.step_over() end), desc_opts("Debug: Step Over"))
 
 -- 🧩 DAP UI management
-keymap("n", "<Leader>du", "<Cmd>lua require('dapui').open()<CR>", desc_opts("Debug: Open UI"))
-keymap("n", "<Leader>dq", "<Cmd>lua require('dapui').close()<CR>", desc_opts("Debug: Close UI"))
-keymap("n", "<Leader>de", "<Cmd>lua require('dapui').eval()<CR>", desc_opts("Evaluate Expression"))
+keymap("n", "<Leader>du", with_module('dapui', function(dapui) dapui.toggle() end), desc_opts("Debug: Toggle UI"))
+keymap("n", "<Leader>dq", with_module('dapui', function(dapui) dapui.close() end), desc_opts("Debug: Close UI"))
+keymap("n", "<Leader>de", with_module('dapui', function(dapui) dapui.eval() end), desc_opts("Evaluate Expression"))
 
 -- 🧠 Evaluation and inspection
-keymap("n", "<Leader>dh", "<Cmd>lua require('dapui').eval()<CR>", desc_opts("Debug: Evaluate Expression"))
-keymap("n", "<Leader>dw", "<Cmd>lua require('dapui').float_element('watches', { enter = true })<CR>",
+keymap("n", "<Leader>dh", with_module('dapui', function(dapui) dapui.eval() end), desc_opts("Debug: Evaluate Expression"))
+keymap("n", "<Leader>dw", with_module('dapui', function(dapui) dapui.float_element('watches', { enter = true }) end),
     desc_opts("Debug: Show Watches"))
-keymap("n", "<Leader>ds", "<Cmd>lua require('dapui').float_element('scopes', { enter = true })<CR>",
+keymap("n", "<Leader>ds", with_module('dapui', function(dapui) dapui.float_element('scopes', { enter = true }) end),
     desc_opts("Debug: Show Scopes"))
-keymap("n", "<Leader>dr", "<Cmd>lua require('dapui').float_element('repl', { enter = true })<CR>",
+keymap("n", "<Leader>dr", with_module('dapui', function(dapui) dapui.float_element('repl', { enter = true }) end),
     desc_opts("Debug: Open REPL"))
 
 -- 🔲 Window Management
@@ -371,6 +392,7 @@ keymap("n", "<Leader>dm", "<Cmd>MaximizerToggle<CR>", desc_opts("Toggle Maximize
 -- 🎮 TRAINING & UTILITIES
 -- =============================================================================
 keymap("n", "<leader>vg", ":VimBeGood<CR>", desc_opts("Open VimBeGood game"))
+keymap("n", "<leader>ul", "<cmd>OpenErrorLog<CR>", desc_opts("Open error log"))
 
 -- =============================================================================
 -- 🎨 VISUAL MODE ENHANCEMENTS

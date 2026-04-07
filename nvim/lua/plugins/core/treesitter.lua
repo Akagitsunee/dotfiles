@@ -16,7 +16,7 @@ return {
                 "nvim-treesitter/nvim-treesitter-context",
                 event = "VeryLazy",                                                   -- Load after treesitter is ready
                 opts = {
-                    max_lines = _G.config and _G.config.behavior.scroll_context or 3, -- Use global config
+                    max_lines = 3,
                     trim_scope = 'outer',
                     patterns = {
                         -- Match against more specific patterns
@@ -35,9 +35,7 @@ return {
             },
         },
         config = function()
-            -- Use vim.schedule to defer heavy treesitter setup for better startup performance
-            vim.schedule(function()
-                require("nvim-treesitter.configs").setup({
+                require("nvim-treesitter").setup({
                     -- Only install parsers for languages you actually use
                     ensure_installed = {
                         "lua",
@@ -59,6 +57,12 @@ return {
                         "gitignore",
                         "yaml",
                         "toml",
+                        "dap_repl",
+                        "go",
+                        "gomod",
+                        "gowork",
+                        "gosum",
+                        "svelte",
                         -- "java",
                         -- "python",
                     },
@@ -72,8 +76,8 @@ return {
                         enable = true,
                         -- Disable highlighting for large files to maintain performance
                         disable = function(lang, buf)
-                            local max_filesize = 100 * 1024
-                            local ok, stats = pcall(vim.loop.fs_stat, vim.api.nvim_buf_get_name(buf))
+                            local max_filesize = 1024 * 1024
+                            local ok, stats = pcall(vim.uv.fs_stat, vim.api.nvim_buf_get_name(buf))
                             if ok and stats and stats.size > max_filesize then
                                 return true
                             end
@@ -170,42 +174,12 @@ return {
                         disable = { "python", "yaml", "markdown" },
                     },
 
-                    -- Treesitter-based folding (works with nvim-ufo)
-                    fold = {
-                        enable = false, -- Let nvim-ufo handle folding
-                    },
-
-                    -- Additional modules for enhanced functionality
-                    playground = {
-                        enable = false, -- Disable unless debugging treesitter
-                    },
-
-                    -- Autopairs integration (if you add nvim-autopairs later)
-                    autopairs = {
-                        enable = false,
-                    },
-
-                    -- Context commentstring (for commenting in mixed languages)
-                    context_commentstring = {
-                        enable = true,
-                        enable_autocmd = false, -- Disable autocmd for performance
-                    },
                 })
 
                 -- Set up treesitter-based folding expression
                 -- vim.opt.foldmethod = "expr"
                 -- vim.opt.foldexpr = "nvim_treesitter#foldexpr()"
                 -- vim.opt.foldenable = false -- Start with all folds open
-
-                -- Custom highlight groups using global config colors
-                if _G.config and _G.config.colors then
-                    local colors = _G.config.colors
-                    vim.api.nvim_set_hl(0, "@keyword", { fg = colors.primary, italic = true })
-                    vim.api.nvim_set_hl(0, "@function", { fg = colors.secondary, bold = true })
-                    vim.api.nvim_set_hl(0, "@string", { fg = colors.success })
-                    vim.api.nvim_set_hl(0, "@comment", { fg = colors.info, italic = true })
-                end
-            end)
         end,
     },
 }

@@ -8,18 +8,18 @@ return {
                 signs = {
                     add          = { text = _G.config.icons.git.added },
                     change       = { text = _G.config.icons.git.modified },
-                    delete       = { text = _G.config.icons.git.removed },
-                    topdelete    = { text = _G.config.icons.git.removed },
-                    changedelete = { text = _G.config.icons.git.modified },
+                    delete       = { text = '󰍵' },
+                    topdelete    = { text = '‾' },
+                    changedelete = { text = '󱕖' },
                     untracked    = { text = _G.config.icons.git.untracked },
                 },
 
                 signs_staged = {
                     add          = { text = _G.config.icons.git.staged },
                     change       = { text = _G.config.icons.git.staged },
-                    delete       = { text = _G.config.icons.git.staged },
-                    topdelete    = { text = _G.config.icons.git.staged },
-                    changedelete = { text = _G.config.icons.git.staged },
+                    delete       = { text = '󰍵' },
+                    topdelete    = { text = '‾' },
+                    changedelete = { text = '󱕖' },
                 },
 
                 -- ADHD-friendly: Reduce visual noise

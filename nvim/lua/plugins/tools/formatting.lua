@@ -2,7 +2,7 @@ return {
     {
         "stevearc/conform.nvim",
         event = { "BufWritePre", "BufNewFile" },
-        cmd = { "ConformInfo" },
+        cmd = { "ConformInfo", "Format", "FormatToggle" },
         config = function()
             local conform = require("conform")
 
@@ -10,19 +10,21 @@ return {
             conform.setup({
                 formatters_by_ft = {
                     lua = { "stylua" },
-                    javascript = { "prettier", "eslint_d" },
-                    typescript = { "prettier", "eslint_d" },
-                    javascriptreact = { "prettier", "eslint_d" },
-                    typescriptreact = { "prettier", "eslint_d" },
-                    json = { "prettier" },
-                    yaml = { "prettier" },
-                    markdown = { "prettier" },
-                    html = { "prettier" },
-                    css = { "prettier" },
-                    scss = { "prettier" },
-                    python = { "isort", "black" },
-                    java = { "google-java-format" },
-                    go = { "goimports", "gofmt" },
+                    javascript = { "prettierd" },
+                    typescript = { "prettierd" },
+                    javascriptreact = { "prettierd" },
+                    typescriptreact = { "prettierd" },
+                    json = { "prettierd" },
+                    yaml = { "prettierd" },
+                    markdown = { "prettierd" },
+                    html = { "prettierd" },
+                    css = { "prettierd" },
+                    scss = { "prettierd" },
+                    svelte = { "prettierd" },
+                    -- python = { "isort", "black" },
+                    -- java = { "google-java-format" },
+                    go = { "goimports", "gofumpt" },
+                    sh = { "shfmt" },
                 },
 
                 -- 🎨 Visual Formatting Options
@@ -34,7 +36,7 @@ return {
 
                     -- Skip formatting for large files (performance)
                     local max_filesize = 100 * 1024 -- 100 KB
-                    local ok, stats = pcall(vim.loop.fs_stat, vim.api.nvim_buf_get_name(bufnr))
+                    local ok, stats = pcall(vim.uv.fs_stat, vim.api.nvim_buf_get_name(bufnr))
                     if ok and stats and stats.size > max_filesize then
                         return false
                     end
@@ -49,67 +51,28 @@ return {
                     stylua = {
                         prepend_args = { "--indent-type", "Spaces", "--indent-width", "2" },
                     },
-                    prettier = {
+                    prettierd = {
                         prepend_args = { "--tab-width", "2", "--single-quote", "true" },
                     },
                 },
             })
 
-            -- 🎯 Smart Format Function (Your Original Logic Enhanced)
-            local function smart_format()
-                local bufnr = vim.api.nvim_get_current_buf()
-
-                local ok, _ = pcall(require("conform").format, {
-                    bufnr = bufnr,
-                    timeout_ms = 1000,
-                    lsp_fallback = true,
-                })
-
-                if not ok then
-                    vim.lsp.buf.format({ async = true, bufnr = bufnr })
-                end
-            end
-
-            -- 🔄 Auto-format Setup (Respects Global Config)
-            if _G.config.behavior.format_on_save then
-                local format_group = vim.api.nvim_create_augroup("SmartFormatOnSave", { clear = true })
-                vim.api.nvim_create_autocmd("BufWritePre", {
-                    group = format_group,
-                    callback = smart_format,
-                    desc = "Smart format on save",
-                })
-            end
-
             -- 🎮 User Commands for Manual Control
-            vim.api.nvim_create_user_command("Format", smart_format, {
-                desc = "Format current buffer with smart detection",
-            })
+            vim.api.nvim_create_user_command("Format", function()
+                require("conform").format({ timeout_ms = 1000, lsp_fallback = true })
+            end, { desc = "Format current buffer with smart detection" })
+
 
             vim.api.nvim_create_user_command("FormatToggle", function()
                 _G.config.behavior.format_on_save = not _G.config.behavior.format_on_save
-
-                if _G.config.behavior.format_on_save then
-                    -- Enable auto-format
-                    local format_group = vim.api.nvim_create_augroup("SmartFormatOnSave", { clear = true })
-                    vim.api.nvim_create_autocmd("BufWritePre", {
-                        group = format_group,
-                        callback = smart_format,
-                        desc = "Smart format on save",
-                    })
-
-                    require("notify")("Format on save enabled", "info", {
-                        title = "Formatting",
-                        icon = _G.config.icons and _G.config.icons.ui.check or "✓",
-                    })
-                else
-                    -- Disable auto-format
-                    pcall(vim.api.nvim_del_augroup_by_name, "SmartFormatOnSave")
-
-                    require("notify")("Format on save disabled", "warn", {
-                        title = "Formatting",
-                        icon = _G.config.icons and _G.config.icons.ui.close or "✗",
-                    })
-                end
+                
+                local status = _G.config.behavior.format_on_save and "enabled" or "disabled"
+                local icon = _G.config.behavior.format_on_save and (_G.config.icons and _G.config.icons.ui.check or "✓") or (_G.config.icons and _G.config.icons.ui.close or "✗")
+                
+                require("notify")("Format on save " .. status, _G.config.behavior.format_on_save and "info" or "warn", {
+                    title = "Formatting",
+                    icon = icon,
+                })
             end, {
                 desc = "Toggle format on save",
             })
@@ -122,6 +85,7 @@ return {
     {
         "mfussenegger/nvim-lint",
         event = { "BufReadPre", "BufNewFile" },
+        cmd = { "LintBuffer", "LintInfo" },
         config = function()
             local lint = require("lint")
 
@@ -131,9 +95,11 @@ return {
                 typescript = { "eslint_d" },
                 javascriptreact = { "eslint_d" },
                 typescriptreact = { "eslint_d" },
-                python = { "pylint", "mypy" },
+                -- python = { "pylint", "mypy" },
+                svelte = { "eslint_d" },
                 markdown = { "markdownlint" },
                 yaml = { "yamllint" },
+                go = { "golangcilint" },
                 dockerfile = { "hadolint" },
                 sh = { "shellcheck" },
                 lua = { "luacheck" },
@@ -154,7 +120,7 @@ return {
 
                 -- Skip linting for large files (performance)
                 local max_filesize = 200 * 1024 -- 200 KB
-                local ok, stats = pcall(vim.loop.fs_stat, vim.api.nvim_buf_get_name(bufnr))
+                local ok, stats = pcall(vim.uv.fs_stat, vim.api.nvim_buf_get_name(bufnr))
                 if ok and stats and stats.size > max_filesize then
                     return
                 end
@@ -164,7 +130,28 @@ return {
                     return
                 end
 
-                lint.try_lint()
+                -- 🔍 Conditionally run eslint_d ONLY if config is present
+                local names = lint._resolve_linter_by_ft(vim.bo[bufnr].filetype)
+                local linters_to_run = {}
+                
+                for _, name in ipairs(names) do
+                    if name == "eslint_d" then
+                        local eslint_root = vim.fs.find({
+                            ".eslintrc", ".eslintrc.js", ".eslintrc.cjs", ".eslintrc.yaml", ".eslintrc.yml", ".eslintrc.json",
+                            "eslint.config.js", "eslint.config.mjs", "eslint.config.cjs", "package.json"
+                        }, { path = vim.api.nvim_buf_get_name(bufnr), upward = true })[1]
+                        
+                        if eslint_root then
+                            table.insert(linters_to_run, name)
+                        end
+                    else
+                        table.insert(linters_to_run, name)
+                    end
+                end
+
+                if #linters_to_run > 0 then
+                    lint.try_lint(linters_to_run)
+                end
             end
 
             -- 🔄 Auto-lint Events (Optimized for Performance)

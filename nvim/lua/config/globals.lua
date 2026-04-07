@@ -9,24 +9,30 @@ _G.config = {
       or { '─', '│', '─', '│', '┌', '┐', '┘', '└' }
       or { '🭽', '▔', '🭾', '▕', '🭿', '▁', '🭼', '▏' },
     transparency = 0.9, -- Global transparency level
-    blend = 10, -- Popup blend amount
-    winblend = 0, -- Window background blend
+    blend = 8, -- Popup blend amount
+    winblend = 6, -- Window background blend
   },
 
   -- 🌈 COLOR SYSTEM
   colors = {
-    primary = '#7aa2f7', -- Accent color for highlights
-    secondary = '#bb9af7', -- Secondary accent
-    success = '#9ece6a', -- Success states
-    warning = '#e0af68', -- Warning states
-    error = '#f7768e', -- Error states
-    info = '#7dcfff', -- Info states
-    line_number = '#ffffff',
+    bg = '#1e2127',
+    panel = '#282c34',
+    surface = '#2c323c',
+    subtle = '#3e4452',
+    fg = '#abb2bf',
+    muted = '#5c6370',
+    primary = '#61afef', -- Accent color for highlights
+    secondary = '#c678dd', -- Secondary accent
+    success = '#98c379', -- Success states
+    warning = '#e5c07b', -- Warning states
+    error = '#e06c75', -- Error states
+    info = '#56b6c2', -- Info states
+    line_number = '#4b5263',
   },
 
   -- 📐 SPACING & LAYOUT
   layout = {
-    indent_size = 20, -- Global indentation
+    indent_size = 2, -- Global indentation
     line_spacing = 0, -- Additional line spacing
     sidebar_width = 50, -- File explorer width
     popup_max_height = 15, -- Max height for popups
@@ -39,27 +45,27 @@ _G.config = {
 
   -- 🔤 TYPOGRAPHY
   fonts = {
-    size = 14, -- Font size (if using GUI)
-    family = 'JetBrains Mono', -- Font family preference
+    size = 15, -- Font size (if using GUI)
+    family = 'JetBrainsMono Nerd Font', -- Font family preference
   },
 
   -- 🎯 ICONS & SYMBOLS (Consistent across all plugins)
   icons = {
     diagnostics = {
-      error = '󰅚 ',
-      warn = '󰀪 ',
-      info = '󰋽 ',
-      hint = '󰌶 ',
+      error = ' ',
+      warn = ' ',
+      info = '󰋼 ',
+      hint = '󰛩 ',
     },
     git = {
-      added = ' ',
+      added = '│',
       ignored = ' ',
-      modified = ' ',
+      modified = '│',
       removed = ' ',
       renamed = ' ',
-      untracked = '',
+      untracked = '│',
       unstaged = '󰄱 ',
-      staged = '',
+      staged = '│',
       conflict = '',
       logo = ' ',
       branch = ' ',
@@ -147,18 +153,25 @@ _G.config = {
       next = '󰁄 ',
     },
     groups = {
-      ai = '🤖',
-      code = '✨',
-      debug = '🐛',
-      find = '🔭',
-      git = '',
-      lazy = '🔌',
-      paste_project = '📋',
-      quit = '🚪',
-      search = '🔍',
-      text = 'פּ',
-      ui = '🎨',
-      trouble = '⚠️',
+      ai = '󰚩 ',
+      code = '󰅱 ',
+      debug = '󰃤 ',
+      find = '󰍉 ',
+      git = ' ',
+      lazy = '󰒲 ',
+      paste_project = '󰆏 ',
+      quit = '󰗼 ',
+      search = '󰍉 ',
+      text = '󰭷 ',
+      ui = '󰙵 ',
+      trouble = '󱖫 ',
+      buffer = '󰓩 ',
+      windows = '󱂬 ',
+      go_to = '󰌑 ',
+      surround = '󰅪 ',
+      fold = '󰙴 ',
+      prev = '󰁍 ',
+      next = '󰁔 ',
     },
   },
 
@@ -274,7 +287,7 @@ _G.config = {
 
   -- 🎭 THEME SETTINGS
   theme = {
-    name = 'carbonfox', -- Default colorscheme
+    name = 'onedark', -- Default colorscheme
     transparent_background = false,
     italic_comments = true,
     italic_keywords = false,
