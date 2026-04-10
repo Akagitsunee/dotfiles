@@ -47,32 +47,32 @@ This repo only keeps personal config and custom files. Third-party dependencies 
 
 ### Shell
 
-- [`zsh/.zshrc`](/Users/yano/dev/dotfiles/zsh/.zshrc) -> `~/.zshrc`
+- [`zsh/.zshrc`](zsh/.zshrc) -> `~/.zshrc`
 - `oh-my-zsh` -> `~/.oh-my-zsh`
 - Oh My Zsh custom plugins -> `~/.oh-my-zsh/custom/plugins/`
 
 ### Terminal and prompt
 
-- [`wezterm/`](/Users/yano/dev/dotfiles/wezterm) -> `~/.config/wezterm/`
-- [`wezterm/wezterm.lua`](/Users/yano/dev/dotfiles/wezterm/wezterm.lua) -> `~/.wezterm.lua`
-- [`ghostty/`](/Users/yano/dev/dotfiles/ghostty) -> `~/.config/ghostty/`
-- [`starship/starship.toml`](/Users/yano/dev/dotfiles/starship/starship.toml) -> `~/.config/starship.toml`
+- [`wezterm/`](wezterm) -> `~/.config/wezterm/`
+- [`wezterm/wezterm.lua`](wezterm/wezterm.lua) -> `~/.wezterm.lua`
+- [`ghostty/`](ghostty) -> `~/.config/ghostty/`
+- [`starship/starship.toml`](starship/starship.toml) -> `~/.config/starship.toml`
 
 ### Editor
 
-- [`nvim/`](/Users/yano/dev/dotfiles/nvim) -> `~/.config/nvim/`
+- [`nvim/`](nvim) -> `~/.config/nvim/`
 
 ### Tmux
 
-- [`tmux/tmux.conf`](/Users/yano/dev/dotfiles/tmux/tmux.conf) -> `~/.config/tmux/tmux.conf`
-- [`tmux/onedark-theme.conf`](/Users/yano/dev/dotfiles/tmux/onedark-theme.conf) -> `~/.config/tmux/onedark-theme.conf`
-- [`tmux/nord-theme.conf`](/Users/yano/dev/dotfiles/tmux/nord-theme.conf) -> `~/.config/tmux/nord-theme.conf`
+- [`tmux/tmux.conf`](tmux/tmux.conf) -> `~/.config/tmux/tmux.conf`
+- [`tmux/onedark-theme.conf`](tmux/onedark-theme.conf) -> `~/.config/tmux/onedark-theme.conf`
+- [`tmux/nord-theme.conf`](tmux/nord-theme.conf) -> `~/.config/tmux/nord-theme.conf`
 - tmux plugins -> `~/.config/tmux/plugins/`
-- [`tmux-powerline/`](/Users/yano/dev/dotfiles/tmux-powerline) -> `~/.config/tmux-powerline/`
+- [`tmux-powerline/`](tmux-powerline) -> `~/.config/tmux-powerline/`
 
 ### Window management
 
-- [`aerospace/aerospace.toml`](/Users/yano/dev/dotfiles/aerospace/aerospace.toml) -> `~/.config/aerospace/aerospace.toml`
+- [`aerospace/aerospace.toml`](aerospace/aerospace.toml) -> `~/.config/aerospace/aerospace.toml`
 
 ## Notes
 
