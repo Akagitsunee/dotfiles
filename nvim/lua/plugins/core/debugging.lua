@@ -13,6 +13,7 @@ return {
             "theHamsta/nvim-dap-virtual-text",
             "nvim-neotest/nvim-nio",
             "rcarriga/nvim-dap-ui",
+            "leoluz/nvim-dap-go",
             {
                 "LiadOz/nvim-dap-repl-highlights",
                 config = true,
@@ -25,8 +26,13 @@ return {
         config = function()
             local dapui = require("dapui")
             local dap = require("dap")
+            local dap_go = require("dap-go")
             local dap_vt = require("nvim-dap-virtual-text")
             local dap_utils = require("dap.utils")
+
+            local function workspace_folder()
+                return vim.fn.getcwd()
+            end
 
             -- ╭──────────────────────────────────────────────────────────╮
             -- │ DAP Virtual Text Setup (ADHD-Friendly Visual Feedback)  │
@@ -45,6 +51,7 @@ return {
                 all_frames = false,                    -- Focus on current frame
                 virt_lines = false,                    -- Prevent flickering
                 virt_text_win_col = nil,
+                clear_on_continue = true,
             })
 
             -- ╭──────────────────────────────────────────────────────────╮
@@ -67,19 +74,19 @@ return {
                 layouts = {
                     {
                         elements = {
-                            { id = "scopes", size = 0.25 },
+                            { id = "scopes", size = 0.40 },
                             "breakpoints",
                             "watches",
                         },
-                        size = _G.config.layout.sidebar_width or 40,
-                        position = "left",
+                        size = 42,
+                        position = "right",
                     },
                     {
                         elements = {
                             "repl",
                             "console",
                         },
-                        size = 0.25,
+                        size = 12,
                         position = "bottom",
                     },
                 },
@@ -102,12 +109,18 @@ return {
             -- ╰──────────────────────────────────────────────────────────╯
             dap.set_log_level("TRACE")
 
-            -- Keep the debugging UI manual-first to avoid fighting the tree/trouble layout.
+            -- Open and close the UI with the session so debugging feels more IDE-like.
             dap.listeners.before.event_terminated["dapui_config"] = function()
                 dapui.close()
             end
             dap.listeners.before.event_exited["dapui_config"] = function()
                 dapui.close()
+            end
+            dap.listeners.before.disconnect["dapui_config"] = function()
+                dapui.close()
+            end
+            dap.listeners.after.event_initialized["dapui_config"] = function()
+                dapui.open()
             end
 
             -- Enable virtual text for inline debugging info
@@ -144,8 +157,51 @@ return {
             vim.fn.sign_define("DapStopped", {
                 text = debug_icons.stopped,
                 texthl = "",
+                linehl = "Visual",
+                numhl = ""
+            })
+            vim.fn.sign_define("DapLogPoint", {
+                text = "◆",
+                texthl = "",
                 linehl = "",
                 numhl = ""
+            })
+
+            -- ╭──────────────────────────────────────────────────────────╮
+            -- │ Go / Delve Debugging                                    │
+            -- ╰──────────────────────────────────────────────────────────╯
+            local dlv_path = vim.fn.exepath("dlv")
+            dap_go.setup({
+                delve = {
+                    path = dlv_path ~= "" and dlv_path or "dlv",
+                    initialize_timeout_sec = 20,
+                    port = "${port}",
+                    args = {},
+                    build_flags = "",
+                    detached = vim.fn.has("win32") == 0,
+                    cwd = nil,
+                },
+                dap_configurations = {
+                    {
+                        type = "go",
+                        name = "Debug File",
+                        request = "launch",
+                        program = "${file}",
+                    },
+                    {
+                        type = "go",
+                        name = "Debug Package",
+                        request = "launch",
+                        program = "${fileDirname}",
+                    },
+                    {
+                        type = "go",
+                        name = "Debug Package Tests",
+                        request = "launch",
+                        mode = "test",
+                        program = "${fileDirname}",
+                    },
+                },
             })
 
             -- ╭──────────────────────────────────────────────────────────╮
@@ -234,7 +290,7 @@ return {
                     request = 'attach',
                     port = 9231,
                     skipFiles = { '<node_internals>/**', 'node_modules/**' },
-                    cwd = '${workspaceFolder}',
+                    cwd = workspace_folder,
                 },
 
                 -- Launch current file with pnpm dev
@@ -242,7 +298,7 @@ return {
                     type = "pwa-node",
                     request = "launch",
                     name = "Launch with pnpm dev",
-                    cwd = vim.fn.getcwd(),
+                    cwd = workspace_folder,
                     args = { "${file}" },
                     sourceMaps = true,
                     protocol = "inspector",
@@ -259,7 +315,7 @@ return {
                     type = "pwa-node",
                     request = "launch",
                     name = "Launch with ts-node",
-                    cwd = vim.fn.getcwd(),
+                    cwd = workspace_folder,
                     runtimeArgs = { "--loader", "ts-node/esm" },
                     runtimeExecutable = "node",
                     args = { "${file}" },
@@ -277,7 +333,7 @@ return {
                     type = "pwa-node",
                     request = "launch",
                     name = "Debug Jest Tests",
-                    cwd = vim.fn.getcwd(),
+                    cwd = workspace_folder,
                     runtimeArgs = { "${workspaceFolder}/node_modules/.bin/jest" },
                     runtimeExecutable = "node",
                     args = { "${file}", "--coverage", "false" },
@@ -293,7 +349,7 @@ return {
                     type = "pwa-node",
                     request = "launch",
                     name = "Debug Vitest Tests",
-                    cwd = vim.fn.getcwd(),
+                    cwd = workspace_folder,
                     program = "${workspaceFolder}/node_modules/vitest/vitest.mjs",
                     args = { "--inspect-brk", "--threads", "false", "run", "${file}" },
                     autoAttachChildProcesses = true,
@@ -307,7 +363,7 @@ return {
                     type = "pwa-node",
                     request = "launch",
                     name = "Debug Deno",
-                    cwd = vim.fn.getcwd(),
+                    cwd = workspace_folder,
                     runtimeArgs = { "test", "--inspect-brk", "--allow-all", "${file}" },
                     runtimeExecutable = "deno",
                     attachSimplePort = 9229,
@@ -319,7 +375,7 @@ return {
                     request = "attach",
                     name = "Attach to Chrome",
                     program = "${file}",
-                    cwd = vim.fn.getcwd(),
+                    cwd = workspace_folder,
                     sourceMaps = true,
                     protocol = 'inspector',
                     port = function()
@@ -347,7 +403,7 @@ return {
                     type = "pwa-node",
                     request = "attach",
                     name = "Attach to Node Process",
-                    cwd = vim.fn.getcwd(),
+                    cwd = workspace_folder,
                     processId = dap_utils.pick_process,
                     skipFiles = { "<node_internals>/**" },
                 },

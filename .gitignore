@@ -1,0 +1,37 @@
+# macOS
+.DS_Store
+**/.DS_Store
+
+# Editors
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
+
+# Logs
+*.log
+**/*.log
+
+# Neovim generated state
+nvim/.base46_cache/
+nvim/.logs/
+nvim/nvim.log
+
+# Ghostty generated state
+ghostty/startup.log
+
+# Local tool state
+.luarc.json
+
+# AI/editor workspace artifacts
+**/.claude/
+**/**MEMORY.md
+
+# Optional local scratch space
+tmp/
+.cache/
+
+# Installer-managed dependencies
+.oh-my-zsh/
+tmux/plugins/

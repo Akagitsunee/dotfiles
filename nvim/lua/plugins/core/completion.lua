@@ -38,19 +38,11 @@ return {
   },
 
   config = function(_, opts)
-    require('blink.cmp').setup(opts)
-
-    -- Safely pull icons AFTER _G.config is defined
+    -- Safely pull icons after globals are available and before blink is set up.
     local icons = (_G.config and _G.config.icons and _G.config.icons.kinds) or {}
     opts.appearance.kind_icons = icons
 
-    -- ADHD-friendly: Clear completion on Escape
-    vim.keymap.set('i', '<Esc>', function()
-      if require('blink.cmp').is_visible() then
-        require('blink.cmp').cancel()
-      end
-      return '<Esc>'
-    end, { expr = true })
+    require('blink.cmp').setup(opts)
 
     -- Setup blink.pairs
     require('blink.pairs').setup({
@@ -96,6 +88,7 @@ return {
       ["<C-u>"] = { "scroll_documentation_up", "fallback" },
       ["<C-d>"] = { "scroll_documentation_down", "fallback" },
       ["<C-e>"] = { "cancel", "fallback" },
+      ["<Esc>"] = { "cancel", "fallback" },
       -- Quick accept with Ctrl+Space
       ["<C-Space>"] = { "accept", "fallback" },
     },

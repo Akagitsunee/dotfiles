@@ -28,46 +28,6 @@ window-colorspace = display-p3
 # Note: Ghostty's default line spacing is generally good, adjust only if needed
 
 # ============================================================================
-# COLORS - Custom Dark Theme
-# ============================================================================
-# Replicating your custom WezTerm "dark" color scheme
-
-background = 222836
-foreground = ffffff
-
-# Cursor colors
-cursor-color = ffffff
-cursor-text = 16181a
-
-# Selection colors  
-selection-background = 5eff6c
-selection-foreground = 16181a
-
-# ANSI Colors (0-7: normal colors)
-palette = 0=#16181a
-palette = 1=#ff5ea0
-palette = 2=#5eff6c
-palette = 3=#ffbd5e
-palette = 4=#5ea1ff
-palette = 5=#bd5eff
-palette = 6=#5ef1ff
-palette = 7=#ffffff
-
-# Bright colors (8-15)
-palette = 8=#16181a
-palette = 9=#ff5ea0
-palette = 10=#5eff6c
-palette = 11=#ffbd5e
-palette = 12=#5ea1ff
-palette = 13=#bd5eff
-palette = 14=#5ef1ff
-palette = 15=#ffffff
-
-# Extended colors
-palette = 16=#d17c00
-palette = 17=#d11500
-
-# ============================================================================
 # CURSOR
 # ============================================================================
 cursor-style = bar
@@ -159,6 +119,7 @@ link-url = true
 
 # theme = Catppuccin Mocha
 # theme = light:Catppuccin Latte,dark:Catppuccin Mocha  # Auto-switch
+theme = Wezterm
 
 # ============================================================================
 # PERFORMANCE
@@ -166,4 +127,3 @@ link-url = true
 # Ghostty is optimized by default, but here are some options:
 # clipboard-trim-trailing-spaces = false
 # clipboard-paste-bracketed-safe = true
-

@@ -360,11 +360,16 @@ end, desc_opts("Toggle inline diagnostics"))
 -- ▶️ Core debugging controls
 keymap("n", "<Leader>dc", with_module('dap', function(dap) dap.continue() end), desc_opts("Debug: Continue"))
 keymap("n", "<Leader>dt", with_module('dap', function(dap) dap.terminate() end), desc_opts("Debug: Terminate"))
+keymap("n", "<Leader>dl", with_module('dap', function(dap) dap.run_last() end), desc_opts("Debug: Run Last"))
+keymap("n", "<Leader>dj", with_module('dap', function(dap) dap.run_to_cursor() end), desc_opts("Debug: Run to Cursor"))
 
 -- 🛑 Breakpoint management
 keymap("n", "<Leader>db", with_module('dap', function(dap) dap.toggle_breakpoint() end), desc_opts("Debug: Toggle Breakpoint"))
 keymap("n", "<Leader>dB", with_module('dap', function(dap) dap.set_breakpoint(vim.fn.input('Breakpoint condition: ')) end),
     desc_opts("Debug: Conditional Breakpoint"))
+keymap("n", "<Leader>dp", with_module('dap', function(dap) dap.set_breakpoint(nil, nil, vim.fn.input('Log point message: ')) end),
+    desc_opts("Debug: Log Point"))
+keymap("n", "<Leader>dx", with_module('dap', function(dap) dap.clear_breakpoints() end), desc_opts("Debug: Clear Breakpoints"))
 
 -- 🪜 Step controls
 keymap("n", "<Leader>di", with_module('dap', function(dap) dap.step_into() end), desc_opts("Debug: Step Into"))
@@ -377,13 +382,25 @@ keymap("n", "<Leader>dq", with_module('dapui', function(dapui) dapui.close() end
 keymap("n", "<Leader>de", with_module('dapui', function(dapui) dapui.eval() end), desc_opts("Evaluate Expression"))
 
 -- 🧠 Evaluation and inspection
-keymap("n", "<Leader>dh", with_module('dapui', function(dapui) dapui.eval() end), desc_opts("Debug: Evaluate Expression"))
+keymap({ "n", "v" }, "<Leader>dh", with_module('dap.ui.widgets', function(widgets) widgets.hover() end), desc_opts("Debug: Hover Value"))
 keymap("n", "<Leader>dw", with_module('dapui', function(dapui) dapui.float_element('watches', { enter = true }) end),
     desc_opts("Debug: Show Watches"))
 keymap("n", "<Leader>ds", with_module('dapui', function(dapui) dapui.float_element('scopes', { enter = true }) end),
     desc_opts("Debug: Show Scopes"))
 keymap("n", "<Leader>dr", with_module('dapui', function(dapui) dapui.float_element('repl', { enter = true }) end),
     desc_opts("Debug: Open REPL"))
+keymap("n", "<Leader>df", with_module('dap.ui.widgets', function(widgets) widgets.centered_float(widgets.frames) end), desc_opts("Debug: Show Frames"))
+keymap("n", "<Leader>dv", with_module('dap.ui.widgets', function(widgets) widgets.centered_float(widgets.scopes) end), desc_opts("Debug: Show Variables"))
+keymap("n", "<Leader>dgt", with_module('dap-go', function(dap_go) dap_go.debug_test() end), desc_opts("Debug Go Test"))
+keymap("n", "<Leader>dgl", with_module('dap-go', function(dap_go) dap_go.debug_last_test() end), desc_opts("Debug Last Go Test"))
+keymap("n", "<Leader>dgp", with_module('dap', function(dap)
+    dap.run({
+        type = 'go',
+        name = 'Debug Package',
+        request = 'launch',
+        program = vim.fn.expand('%:p:h'),
+    })
+end), desc_opts("Debug Go Package"))
 
 -- 🔲 Window Management
 keymap("n", "<Leader>dm", "<Cmd>MaximizerToggle<CR>", desc_opts("Toggle Maximize Current Split"))

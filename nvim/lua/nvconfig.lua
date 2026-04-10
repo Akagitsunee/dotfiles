@@ -1,7 +1,7 @@
 local M = {}
 
 M.base46 = {
-  theme = 'onedark',
+  theme = 'default-dark',
   transparency = _G.config and _G.config.theme and _G.config.theme.transparent_background or false,
   theme_toggle = { 'onedark', 'one_light' },
   integrations = {},

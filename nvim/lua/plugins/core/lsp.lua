@@ -105,6 +105,7 @@ return {
           'goimports',
           'gofumpt',
           'golangci-lint',
+          'delve',
           'markdownlint',
           'yamllint',
           'hadolint',

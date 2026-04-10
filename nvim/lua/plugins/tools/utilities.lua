@@ -42,57 +42,38 @@ return {
         },
     },
     {
-        "lukas-reineke/headlines.nvim",
-        ft = { "markdown", "rmd", "norg", "org" },
+        "MeanderingProgrammer/render-markdown.nvim",
+        ft = { "markdown" },
         dependencies = {
             {
                 "nvim-treesitter/nvim-treesitter",
                 event = { "BufReadPost", "BufNewFile" },
                 build = ":TSUpdate",
-            }
+            },
+            "nvim-tree/nvim-web-devicons",
         },
-        config = function()
-            -- Use vim.schedule to defer the setup for better performance
-            vim.schedule(function()
-                require("headlines").setup({
-                    markdown = {
-                        headline_highlights = {
-                            "Headline1", "Headline2", "Headline3",
-                            "Headline4", "Headline5", "Headline6"
-                        },
-                        codeblock_highlight = "CodeBlock",
-                        dash_highlight = "Dash",
-                        dash_string = "-",
-                        quote_highlight = "Quote",
-                        quote_string = "┃",
-                        fat_headlines = true,
-                        fat_headline_upper_string = "▃",
-                        fat_headline_lower_string = "🬂",
-                    },
-                    rmd = {
-                        headline_highlights = {
-                            "Headline1", "Headline2", "Headline3",
-                            "Headline4", "Headline5", "Headline6"
-                        },
-                        codeblock_highlight = "CodeBlock",
-                    },
-                    norg = {
-                        headline_highlights = {
-                            "Headline1", "Headline2", "Headline3",
-                            "Headline4", "Headline5", "Headline6"
-                        },
-                        codeblock_highlight = "CodeBlock",
-                    },
-                    org = {
-                        headline_highlights = {
-                            "Headline1", "Headline2", "Headline3",
-                            "Headline4", "Headline5", "Headline6"
-                        },
-                        codeblock_highlight = "CodeBlock",
-                    },
-                })
-            end)
-        end,
+        opts = {
+            file_types = { "markdown" },
+            render_modes = { "n", "c", "t" },
+            anti_conceal = {
+                enabled = true,
+                disabled_modes = false,
+                above = 0,
+                below = 0,
+                ignore = {
+                    code_background = true,
+                    indent = true,
+                    sign = true,
+                    virtual_lines = true,
+                },
+            },
+            win_options = {
+                concealcursor = {
+                    rendered = "nvic",
+                    raw = "",
+                },
+            },
+        },
     },
     -- Training and utility plugins
     {
