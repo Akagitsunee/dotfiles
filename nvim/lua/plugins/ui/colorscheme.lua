@@ -106,6 +106,9 @@ local function apply_base46_theme(theme, opts)
     persist_base46_theme(theme)
   end
   _G.refresh_theme_ui()
+  pcall(function()
+    require('config.theme_sync').sync_current_theme()
+  end)
   if opts.notify then
     vim.notify('Theme switched to ' .. theme, vim.log.levels.INFO, { title = 'base46' })
   end
@@ -340,6 +343,7 @@ return {
     end,
     config = function()
       refresh_theme_ui()
+      require('config.theme_sync').setup()
 
       vim.api.nvim_create_autocmd('User', {
         group = vim.api.nvim_create_augroup('DynamicBase46Ui', { clear = true }),
@@ -348,6 +352,9 @@ return {
           if not _G.config.theme.transparent_background then
             apply_ui_highlights()
           end
+          pcall(function()
+            require('config.theme_sync').sync_current_theme()
+          end)
         end,
       })
     end,

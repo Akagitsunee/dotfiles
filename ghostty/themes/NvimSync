@@ -1,0 +1,36 @@
+# Managed by Neovim external theme sync.
+# This file is rewritten while at least one Neovim instance is running.
+background = #181818
+foreground = #d8d8d8
+
+# Cursor colors
+cursor-color = #d8d8d8
+cursor-text = #181818
+
+# Selection colors
+selection-background = #383838
+selection-foreground = #d8d8d8
+
+# ANSI Colors (0-7)
+palette = 0=#181818
+palette = 1=#ab4642
+palette = 2=#a1b56c
+palette = 3=#f7ca88
+palette = 4=#7cafc2
+palette = 5=#86c1b9
+palette = 6=#a1b56c
+palette = 7=#d8d8d8
+
+# Bright colors (8-15)
+palette = 8=#656565
+palette = 9=#ab4642
+palette = 10=#a1b56c
+palette = 11=#f8f8f8
+palette = 12=#7cafc2
+palette = 13=#86c1b9
+palette = 14=#a1b56c
+palette = 15=#d8d8d8
+
+# Extended colors
+palette = 16=#f7ca88
+palette = 17=#ab4642
