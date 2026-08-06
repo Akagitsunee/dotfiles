@@ -101,4 +101,4 @@ Then place this config at:
 
 ```sh
 ~/.config/kitsune
-```
+

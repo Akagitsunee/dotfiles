@@ -107,7 +107,7 @@ keybind = ctrl+0=reset_font_size
 # ============================================================================
 # Ghostty has excellent hyperlink detection built-in
 # Your regex patterns are mostly covered by defaults
-# Additional custom patterns can be added if needed
+# Additional custom patterns can be added if neededj
 
 link-url = true
 

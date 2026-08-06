@@ -7,19 +7,19 @@ Personal macOS/Linux shell and terminal setup with a single bootstrap command.
 Fresh machine:
 
 ```bash
-sh -c "$(curl -fsSL https://raw.githubusercontent.com/Akagitsunee/dotfiles/master/bootstrap.sh)"
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/Akagitsunee/dotfiles/master/bootstrap.sh)"
 ```
 
 That script will:
 
-- clone this repo to `~/dotfiles` if it is not there yet
+- clone this repo to `~/dev/dotfiles` if it is not there yet
 - update it if it already exists
 - run `install.sh`
 
 If you already have the repo locally:
 
 ```bash
-cd ~/dotfiles
+cd ~/dev/dotfiles
 ./install.sh
 ```
 
@@ -32,6 +32,7 @@ It will:
 - back up existing files before replacing them
 - install or update `oh-my-zsh` in `~/.oh-my-zsh`
 - install or update the required Oh My Zsh custom plugins
+- install required CLI tools when missing and a supported package manager is available
 - install or update tmux plugins in `~/.config/tmux/plugins`
 - symlink the configs from this repo into `~` and `~/.config`
 
@@ -47,9 +48,14 @@ This repo only keeps personal config and custom files. Third-party dependencies 
 
 ### Shell
 
-- [`zsh/.zshrc`](zsh/.zshrc) -> `~/.zshrc`
+- `zsh/.zprofile` -> `~/.zprofile`
+- `zsh/.zshenv` -> `~/.zshenv`
+- [`zsh/.zshrc`](zsh/.zshrc) -> `~/.config/zsh/.zshrc`
+- zsh modules in [`zsh/`](zsh) -> `~/.config/zsh/`
 - `oh-my-zsh` -> `~/.oh-my-zsh`
 - Oh My Zsh custom plugins -> `~/.oh-my-zsh/custom/plugins/`
+- CLI tools used by the shell config: `zoxide`, `eza`, `bat`, `fd`, `fzf`, `rg`
+- Debian/Ubuntu package names are normalized when needed by linking `batcat` -> `bat` and `fdfind` -> `fd` in `~/.local/bin`
 
 ### Terminal and prompt
 
@@ -79,12 +85,13 @@ This repo only keeps personal config and custom files. Third-party dependencies 
 - Existing files are moved out of the way before links are created.
 - `stow.sh` and `unstow.sh` are compatibility wrappers around `install.sh` and `uninstall.sh`.
 - The bootstrap command needs `git` and network access.
+- `DOTFILES_DIR`, `DOTFILES_REPO_URL`, and `DOTFILES_BRANCH` can be set before running `bootstrap.sh`.
 
 ## Uninstall
 
 ```bash
-cd ~/dotfiles
+cd ~/dev/dotfiles
 ./uninstall.sh
 ```
 
-This removes symlinks created by the repo. It does not remove `~/.oh-my-zsh` or downloaded tmux plugins.
+This removes symlinks created by the repo. It does not remove `~/.oh-my-zsh`, installed CLI tools, or downloaded tmux plugins.

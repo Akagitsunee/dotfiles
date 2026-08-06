@@ -3,7 +3,7 @@ set -euo pipefail
 
 DOTFILES_REPO_URL="${DOTFILES_REPO_URL:-https://github.com/Akagitsunee/dotfiles.git}"
 DOTFILES_BRANCH="${DOTFILES_BRANCH:-master}"
-DOTFILES_DIR="${DOTFILES_DIR:-$HOME/dotfiles}"
+DOTFILES_DIR="${DOTFILES_DIR:-$HOME/dev/dotfiles}"
 
 require_command() {
   local name="$1"
@@ -23,10 +23,11 @@ main() {
     git -C "$DOTFILES_DIR" pull --ff-only origin "$DOTFILES_BRANCH"
   else
     printf 'Cloning dotfiles into %s\n' "$DOTFILES_DIR"
+    mkdir -p "$(dirname "$DOTFILES_DIR")"
     git clone --depth 1 --branch "$DOTFILES_BRANCH" "$DOTFILES_REPO_URL" "$DOTFILES_DIR"
   fi
 
-  exec "$DOTFILES_DIR/install.sh"
+  exec "$DOTFILES_DIR/install.sh" "$@"
 }
 
 main "$@"

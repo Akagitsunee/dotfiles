@@ -11,6 +11,10 @@ return {
         border = _G.config.ui.border,
         wo = { winblend = _G.config.ui.winblend },
       },
+      keys = {
+        scroll_down = '<PageDown>',
+        scroll_up = '<PageUp>',
+      },
       sort = { 'manual', 'local', 'order', 'group', 'alphanum', 'mod' },
       spec = {
         {
@@ -42,9 +46,9 @@ return {
       {
         '<leader>?',
         function()
-          require('which-key').show { global = false }
+          require('which-key').show()
         end,
-        desc = 'Buffer Keymaps (which-key)',
+        desc = 'Keymaps (which-key)',
       },
       {
         '<c-w><space>',

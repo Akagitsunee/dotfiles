@@ -1,85 +1,77 @@
-ZSH_DISABLE_COMPFIX=true
-export ZSH="$HOME/.oh-my-zsh"
+# =========================================================
+# Shell History & Behavior Settings
+# =========================================================
+HISTFILE="$XDG_STATE_HOME/zsh/history"
+HISTSIZE=100000
+SAVEHIST=100000
 
-plugins=(
-  git
-  docker
-  brew
-  node
-  git-auto-fetch
-  npm
-  autojump
-  git-flow-completion
-  zsh-completions
-  enhancd
-  k
-  zsh-autosuggestions
-  zsh-syntax-highlighting
-  tmux
-  tmux-cssh
-  tmuxinator
-)
+# History rules
+setopt APPEND_HISTORY
+setopt SHARE_HISTORY
+setopt HIST_IGNORE_DUPS
+setopt HIST_IGNORE_SPACE
+setopt HIST_EXPIRE_DUPS_FIRST
+setopt HIST_FIND_NO_DUPS
 
-if [ -f "$ZSH/oh-my-zsh.sh" ]; then
-  source "$ZSH/oh-my-zsh.sh"
+# Navigation behavior
+setopt AUTOCD
+
+# =========================================================
+# Fuzzy finder
+# =========================================================
+
+# macOS / Homebrew (Apple Silicon)
+if [[ -f /opt/homebrew/opt/fzf/shell/key-bindings.zsh ]]; then
+  source /opt/homebrew/opt/fzf/shell/key-bindings.zsh
+  source /opt/homebrew/opt/fzf/shell/completion.zsh
 fi
 
-if command -v starship >/dev/null 2>&1; then
-  eval "$(starship init zsh)"
+# macOS / Homebrew (Intel)
+if [[ -f /usr/local/opt/fzf/shell/key-bindings.zsh ]]; then
+  source /usr/local/opt/fzf/shell/key-bindings.zsh
+  source /usr/local/opt/fzf/shell/completion.zsh
 fi
 
-export PATH="/usr/local/opt/openjdk@17/bin:$PATH"
-export PATH="$PATH:$HOME/.spicetify"
-export PATH="$PATH:$HOME/.local/bin"
-export PATH="$HOME/Library/Android/sdk/platform-tools:$PATH"
-export SSH="$HOME/.ssh"
+# Arch
+if [[ -f /usr/share/fzf/key-bindings.zsh ]]; then
+  source /usr/share/fzf/key-bindings.zsh
+  source /usr/share/fzf/completion.zsh
+fi
 
-alias pip='/usr/local/bin/pipx'
-alias anime='cd ~/Anime'
-alias series='cd ~/Series'
-alias zshc='nvim ~/.zshrc'
-alias gstyc='nvim ~/.config/ghostty/config'
-alias nvimc='nvim ~/.config/nvim'
-alias rmrf='rm -rf'
-alias bizdev='cd ~/bizdev'
-alias dev='cd ~/dev'
-alias cfg='cd ~/.config'
-alias cnv='cd ~/.config/nvim'
-alias cwt='cd ~/.config/wezterm'
-alias cg='cd ~/.config/ghostty'
-alias ctm='cd ~/.config/tmux'
-alias tc='nvim ~/.config/ghostty'
-alias c='clear'
-alias tmux='tmux -f ~/.config/tmux/tmux.conf'
-alias npm='pnpm'
-alias vim='nvim'
-alias dotfiles='cd ~/dev/dotfiles'
-alias joyn='cd ~/dev/golang/joyn-downloader'
-alias zshs='source ~/.zshrc'
+# Ubuntu
+if [[ -f /usr/share/doc/fzf/examples/key-bindings.zsh ]]; then
+  source /usr/share/doc/fzf/examples/key-bindings.zsh
+  source /usr/share/doc/fzf/examples/completion.zsh
+fi
 
-[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+# =========================================================
+# Load Modular Configuration Files
+# =========================================================
+source "$ZDOTDIR/plugins.zsh"
+source "$ZDOTDIR/fzf.zsh"
+source "$ZDOTDIR/aliases.zsh"
+source "$ZDOTDIR/bindings.zsh"
+source "$ZDOTDIR/prompt.zsh"
 
-export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
-[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
-
-export PNPM_HOME="$HOME/Library/pnpm"
-case ":$PATH:" in
-  *":$PNPM_HOME:"*) ;;
-  *) export PATH="$PNPM_HOME:$PATH" ;;
-esac
-
-[ -f "$HOME/.cargo/env" ] && source "$HOME/.cargo/env"
-
+# =========================================================
+# IDE Shell Integrations
+# =========================================================
 if [ "$TERM_PROGRAM" = "vscode" ] && command -v code >/dev/null 2>&1; then
   . "$(code --locate-shell-integration-path zsh)"
 fi
 
-if command -v borders >/dev/null 2>&1; then
-  borders active_color=0xffe1e3e4 inactive_color=0xff494d64 width=2.0 >/dev/null 2>&1 &
-fi
+# =========================================================
+# Node / NVM
+# =========================================================
 
-autoload -U +X bashcompinit && bashcompinit
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && source "$NVM_DIR/nvm.sh"
+[ -s "$NVM_DIR/bash_completion" ] && source "$NVM_DIR/bash_completion"
 
-if [ -x /usr/local/bin/terraform ]; then
-  complete -o nospace -C /usr/local/bin/terraform terraform
-fi
+# pnpm
+export PNPM_HOME="/Users/yano/.local/share/pnpm"
+case ":$PATH:" in
+  *":$PNPM_HOME/bin:"*) ;;
+  *) export PATH="$PNPM_HOME/bin:$PATH" ;;
+esac
+# pnpm end

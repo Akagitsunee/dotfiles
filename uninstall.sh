@@ -5,7 +5,8 @@ DOTFILES_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}"
 
 TARGETS=(
-  "$HOME/.zshrc"
+  "$HOME/.zprofile"
+  "$HOME/.zshenv"
   "$HOME/.wezterm.lua"
   "$CONFIG_DIR/aerospace"
   "$CONFIG_DIR/ghostty"
@@ -38,12 +39,27 @@ remove_link() {
   esac
 }
 
+remove_managed_links_in_dir() {
+  local target_dir="$1"
+  local target_path
+
+  [ -d "$target_dir" ] || return
+
+  shopt -s nullglob dotglob
+  for target_path in "$target_dir"/*; do
+    remove_link "$target_path"
+  done
+  shopt -u nullglob dotglob
+}
+
 main() {
   local target_path
 
   for target_path in "${TARGETS[@]}"; do
     remove_link "$target_path"
   done
+
+  remove_managed_links_in_dir "$CONFIG_DIR/zsh"
 
   printf 'Uninstall complete.\n'
 }
