@@ -20,7 +20,7 @@ OH_MY_ZSH_PLUGIN_REPOS=(
   "https://github.com/zsh-users/zsh-autosuggestions.git $OH_MY_ZSH_CUSTOM_DIR/plugins/zsh-autosuggestions"
   "https://github.com/zsh-users/zsh-completions.git $OH_MY_ZSH_CUSTOM_DIR/plugins/zsh-completions"
   "https://github.com/zsh-users/zsh-syntax-highlighting.git $OH_MY_ZSH_CUSTOM_DIR/plugins/zsh-syntax-highlighting"
-  "https://github.com/unixorn/git-flow-completion.git $OH_MY_ZSH_CUSTOM_DIR/plugins/git-flow-completion"
+  "https://github.com/bobthecow/git-flow-completion.git $OH_MY_ZSH_CUSTOM_DIR/plugins/git-flow-completion"
   "https://github.com/b4b4r07/enhancd.git $OH_MY_ZSH_CUSTOM_DIR/plugins/enhancd"
   "https://github.com/supercrabtree/k.git $OH_MY_ZSH_CUSTOM_DIR/plugins/k"
 )
