@@ -196,11 +196,13 @@ add_unique_package() {
   local package="$1"
   local existing
 
-  for existing in "${MISSING_PACKAGES[@]}"; do
-    if [ "$existing" = "$package" ]; then
-      return
-    fi
-  done
+  if [ "${#MISSING_PACKAGES[@]}" -gt 0 ]; then
+    for existing in "${MISSING_PACKAGES[@]}"; do
+      if [ "$existing" = "$package" ]; then
+        return
+      fi
+    done
+  fi
 
   MISSING_PACKAGES+=("$package")
 }
