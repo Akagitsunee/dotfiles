@@ -31,10 +31,18 @@ It will:
 
 - back up existing files before replacing them
 - install or update `oh-my-zsh` in `~/.oh-my-zsh`
+- install or update `nvm` (cloned from GitHub, not Homebrew — see [Node](#node) below)
 - install or update the required Oh My Zsh custom plugins
 - install required CLI tools when missing and a supported package manager is available
+- on macOS with Homebrew, install `ghostty`, `starship`, `borders`, and the JetBrainsMono Nerd Font if missing
 - install or update tmux plugins in `~/.config/tmux/plugins`
 - symlink the configs from this repo into `~` and `~/.config`
+
+### Prerequisites not automated
+
+- **Homebrew itself** — `install.sh` uses it to install other tools but does not install it. On a fresh Mac, install it first from [brew.sh](https://brew.sh).
+- **AeroSpace** — window manager the `aerospace/` config targets; install manually (`brew install --cask nikitabobko/tap/aerospace`).
+- **Fonts for `wezterm/`** — if you go back to using wezterm, its fallback list expects several Nerd Fonts beyond the JetBrainsMono one `install.sh` installs for ghostty (FiraCode, CaskaydiaCove, SauceCodePro, CommitMono, RobotoMono); install what you need manually.
 
 Backups are stored in:
 
@@ -57,28 +65,39 @@ This repo only keeps personal config and custom files. Third-party dependencies 
 - CLI tools used by the shell config: `zoxide`, `eza`, `bat`, `fd`, `fzf`, `rg`
 - Debian/Ubuntu package names are normalized when needed by linking `batcat` -> `bat` and `fdfind` -> `fd` in `~/.local/bin`
 
+#### Node
+
+Node itself is intentionally **not** installed by this repo. `install.sh` clones `nvm` from GitHub into `~/.local/share/nvm` (not the Homebrew formula, which nvm's own docs advise against) and `.zshenv`/`.zshrc` load it from there. Install whatever Node versions you need with `nvm install <version>` after running the installer.
+
+`npm` ships with whichever Node version `nvm` installs, so there's nothing separate to set up. For `pnpm`, prefer `corepack enable` (built into Node) over a global Homebrew/npm install — it keeps the pnpm version scoped per project instead of one global version drifting out of sync.
+
 ### Terminal and prompt
 
+- [`ghostty/`](ghostty) -> `~/.config/ghostty/` — the terminal actually in use; `install.sh` installs it via Homebrew cask on macOS if missing
+- [`starship/starship.toml`](starship/starship.toml) -> `~/.config/starship.toml` — auto-installed via Homebrew on macOS if missing
 - [`wezterm/`](wezterm) -> `~/.config/wezterm/`
 - [`wezterm/wezterm.lua`](wezterm/wezterm.lua) -> `~/.wezterm.lua`
-- [`ghostty/`](ghostty) -> `~/.config/ghostty/`
-- [`starship/starship.toml`](starship/starship.toml) -> `~/.config/starship.toml`
+  - kept for reference but no longer the daily driver; config is symlinked but not auto-installed
 
 ### Editor
 
 - [`nvim/`](nvim) -> `~/.config/nvim/`
+- `nvim` itself is auto-installed (as `neovim`) by `install.sh` if missing
+- not yet automated: the build toolchain some plugins need (`make`, a C compiler, `cargo`, `go`) — see [`nvim/README.md`](nvim/README.md#requirements)
 
 ### Tmux
 
 - [`tmux/tmux.conf`](tmux/tmux.conf) -> `~/.config/tmux/tmux.conf`
 - [`tmux/onedark-theme.conf`](tmux/onedark-theme.conf) -> `~/.config/tmux/onedark-theme.conf`
 - [`tmux/nord-theme.conf`](tmux/nord-theme.conf) -> `~/.config/tmux/nord-theme.conf`
+- `tmux` itself is auto-installed by `install.sh` if missing (ghostty launches straight into it, so this matters)
 - tmux plugins -> `~/.config/tmux/plugins/`
 - [`tmux-powerline/`](tmux-powerline) -> `~/.config/tmux-powerline/`
 
 ### Window management
 
-- [`aerospace/aerospace.toml`](aerospace/aerospace.toml) -> `~/.config/aerospace/aerospace.toml`
+- [`aerospace/aerospace.toml`](aerospace/aerospace.toml) -> `~/.config/aerospace/aerospace.toml` — requires AeroSpace itself, installed manually (see prerequisites above)
+- `borders` (JankyBorders) draws the active-window border AeroSpace triggers on startup; `install.sh` installs it via Homebrew (`FelixKratz/formulae` tap) on macOS if missing
 
 ## Notes
 

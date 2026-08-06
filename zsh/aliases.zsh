@@ -4,7 +4,6 @@ alias rmrf='rm -rf'
 alias grep='rg --color=auto'
 alias ls='eza'
 alias vim='nvim'
-alias pip='/usr/local/bin/pipx'
 alias npm='pnpm'
 # Detailed listing
 alias ll='eza -lh --icons --git'

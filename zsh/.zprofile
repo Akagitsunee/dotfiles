@@ -1,5 +1,12 @@
-# Evaluate package manager pathing
-eval "$(/usr/local/bin/brew shellenv)"
+# Evaluate package manager pathing (Apple Silicon, Intel, then Linuxbrew)
+if [[ -x /opt/homebrew/bin/brew ]]; then
+  eval "$(/opt/homebrew/bin/brew shellenv)"
+elif [[ -x /usr/local/bin/brew ]]; then
+  eval "$(/usr/local/bin/brew shellenv)"
+elif [[ -x /home/linuxbrew/.linuxbrew/bin/brew ]]; then
+  eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+fi
 
-# Added by Toolbox App
+# Added by Toolbox App (shim location depends on machine config)
 export PATH="$PATH:/usr/local/bin"
+export PATH="$PATH:$HOME/Library/Application Support/JetBrains/Toolbox/scripts"

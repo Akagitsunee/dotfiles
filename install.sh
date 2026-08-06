@@ -14,6 +14,7 @@ BACKUP_USED=0
 OH_MY_ZSH_DIR="${ZSH:-$HOME/.oh-my-zsh}"
 OH_MY_ZSH_CUSTOM_DIR="${ZSH_CUSTOM:-$OH_MY_ZSH_DIR/custom}"
 TMUX_PLUGIN_DIR="$CONFIG_DIR/tmux/plugins"
+NVM_DIR="${NVM_DIR:-$DATA_DIR/nvm}"
 
 OH_MY_ZSH_PLUGIN_REPOS=(
   "https://github.com/zsh-users/zsh-autosuggestions.git $OH_MY_ZSH_CUSTOM_DIR/plugins/zsh-autosuggestions"
@@ -40,6 +41,8 @@ CLI_TOOL_PACKAGES=(
   "fd fd fd fd-find fd-find"
   "fzf fzf fzf fzf fzf"
   "rg ripgrep ripgrep ripgrep ripgrep"
+  "tmux tmux tmux tmux tmux"
+  "nvim neovim neovim neovim neovim"
 )
 
 HOME_LINKS=(
@@ -146,6 +149,10 @@ clone_or_update_repo() {
 
 install_oh_my_zsh() {
   clone_or_update_repo "https://github.com/ohmyzsh/ohmyzsh.git" "$OH_MY_ZSH_DIR"
+}
+
+install_nvm() {
+  clone_or_update_repo "https://github.com/nvm-sh/nvm.git" "$NVM_DIR"
 }
 
 install_plugin_repos() {
@@ -279,6 +286,42 @@ ensure_cli_tools() {
   unset MISSING_PACKAGES
 }
 
+ensure_brew_extras() {
+  if [ "$(detect_package_manager || true)" != "brew" ]; then
+    log "Homebrew not detected. Install ghostty, starship, and borders manually if needed."
+    return
+  fi
+
+  if command -v starship >/dev/null 2>&1; then
+    log "Already installed: starship"
+  else
+    log "Installing starship with Homebrew"
+    brew install starship
+  fi
+
+  if command -v borders >/dev/null 2>&1; then
+    log "Already installed: borders"
+  else
+    log "Installing borders with Homebrew"
+    brew tap FelixKratz/formulae
+    brew install borders
+  fi
+
+  if command -v ghostty >/dev/null 2>&1 || [ -d "/Applications/Ghostty.app" ]; then
+    log "Already installed: ghostty"
+  else
+    log "Installing ghostty with Homebrew"
+    brew install --cask ghostty
+  fi
+
+  if brew list --cask font-jetbrains-mono-nerd-font >/dev/null 2>&1; then
+    log "Already installed: font-jetbrains-mono-nerd-font"
+  else
+    log "Installing JetBrainsMono Nerd Font with Homebrew"
+    brew install --cask font-jetbrains-mono-nerd-font
+  fi
+}
+
 prepare_tmux_config_dir() {
   local tmux_config_dir="$CONFIG_DIR/tmux"
 
@@ -317,9 +360,11 @@ main() {
   mkdir -p "$CONFIG_DIR/zsh" "$CACHE_DIR/zsh" "$STATE_DIR/zsh" "$DATA_DIR"
   prepare_tmux_config_dir
   install_oh_my_zsh
+  install_nvm
   install_plugin_repos "${OH_MY_ZSH_PLUGIN_REPOS[@]}"
   install_plugin_repos "${TMUX_PLUGIN_REPOS[@]}"
   ensure_cli_tools
+  ensure_brew_extras
 
   for entry in "${HOME_LINKS[@]}"; do
     target_name="${entry%% *}"

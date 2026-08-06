@@ -46,7 +46,10 @@ export PATH="$HOME/.local/bin:$PATH"
 export PATH="$CARGO_HOME/bin:$PATH"
 export PATH="$GOBIN:$PATH"
 export PATH="$HOME/go/bin:$PATH"
-export PATH="/usr/local/opt/openjdk@17/bin:$PATH"
+if [[ -d /opt/homebrew/opt/openjdk ]]; then
+  export PATH="/opt/homebrew/opt/openjdk/bin:$PATH"
+elif [[ -d /usr/local/opt/openjdk ]]; then
+  export PATH="/usr/local/opt/openjdk/bin:$PATH"
+fi
 export PATH="$HOME/Library/Android/sdk/platform-tools:$PATH"
-export PATH="$HOME/Library/pnpm/bin:$PATH"
 export PATH="$PATH:$HOME/.spicetify"

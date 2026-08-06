@@ -64,12 +64,12 @@ fi
 # Node / NVM
 # =========================================================
 
-export NVM_DIR="$HOME/.nvm"
+# NVM_DIR is set in .zshenv (XDG-compliant path)
 [ -s "$NVM_DIR/nvm.sh" ] && source "$NVM_DIR/nvm.sh"
 [ -s "$NVM_DIR/bash_completion" ] && source "$NVM_DIR/bash_completion"
 
 # pnpm
-export PNPM_HOME="/Users/yano/.local/share/pnpm"
+export PNPM_HOME="$XDG_DATA_HOME/pnpm"
 case ":$PATH:" in
   *":$PNPM_HOME/bin:"*) ;;
   *) export PATH="$PNPM_HOME/bin:$PATH" ;;

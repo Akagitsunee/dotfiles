@@ -21,11 +21,6 @@ autoload -Uz compinit && compinit -d "$XDG_CACHE_HOME/zsh/zcompdump"
 # 2. Safely load the Bash transition layer on top of it
 autoload -U +X bashcompinit && bashcompinit
 
-# 3. Apply your tool autocompletions safely now
-if [ -x /usr/local/bin/terraform ]; then
-  complete -o nospace -C /usr/local/bin/terraform terraform
-fi
-
 # Enable interactive completion menu selection (arrow keys)
 zstyle ':completion:*' menu select
 

@@ -53,11 +53,11 @@ Language tooling depends on what you edit, but this config is set up to make use
 
 ## Install
 
-This config currently lives inside a broader dotfiles repo, so the normal setup is:
+This config currently lives inside a broader dotfiles repo. The normal setup is the top-level [bootstrap command](../README.md#install), which clones to `~/dev/dotfiles` and symlinks everything, including this directory, into place. To set up just this piece manually:
 
 ```sh
-git clone git@github.com:Akagitsunee/dotfiles.git ~/dotfiles
-ln -s ~/dotfiles/nvim ~/.config/nvim
+git clone git@github.com:Akagitsunee/dotfiles.git ~/dev/dotfiles
+ln -s ~/dev/dotfiles/nvim ~/.config/nvim
 ```
 
 If you manage dotfiles some other way, the only requirement is that this directory ends up at Neovim's config path.
