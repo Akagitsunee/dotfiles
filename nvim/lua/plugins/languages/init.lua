@@ -38,16 +38,17 @@ return {
         "plugins.languages.bashls",
         "plugins.languages.cssls",
         -- "plugins.languages.eslint",
-        -- "plugins.languages.graphql",
+        "plugins.languages.graphql",
         "plugins.languages.html",
         "plugins.languages.go",
         "plugins.languages.jsonls",
         "plugins.languages.lua_ls",
         "plugins.languages.tailwindcss",
         "plugins.languages.svelte",
-        -- "plugins.languages.vuels",
+        "plugins.languages.typescript",
+        "plugins.languages.vuels",
+        "plugins.languages.yamlls",
     }),
-    unpack(require("plugins.languages.typescript")),
 }
 
 -- vim: ts=2 sts=2 sw=2 et

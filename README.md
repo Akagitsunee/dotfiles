@@ -83,6 +83,7 @@ Node itself is intentionally **not** installed by this repo. `install.sh` clones
 
 - [`nvim/`](nvim) -> `~/.config/nvim/`
 - `nvim` itself is auto-installed (as `neovim`) by `install.sh` if missing
+- `luarocks` is auto-installed by `install.sh` — Mason (inside nvim) needs it to build `luacheck`; everything else Mason installs is a prebuilt binary with no external prerequisite
 - not yet automated: the build toolchain some plugins need (`make`, a C compiler, `cargo`, `go`) — see [`nvim/README.md`](nvim/README.md#requirements)
 
 ### Tmux

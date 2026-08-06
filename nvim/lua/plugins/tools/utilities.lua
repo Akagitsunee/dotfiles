@@ -45,11 +45,9 @@ return {
         "MeanderingProgrammer/render-markdown.nvim",
         ft = { "markdown" },
         dependencies = {
-            {
-                "nvim-treesitter/nvim-treesitter",
-                event = { "BufReadPost", "BufNewFile" },
-                build = ":TSUpdate",
-            },
+            -- Full spec lives in plugins/core/treesitter.lua; lazy.nvim merges
+            -- fragments by plugin name so only the name is needed here.
+            "nvim-treesitter/nvim-treesitter",
             "nvim-tree/nvim-web-devicons",
         },
         opts = {
@@ -80,6 +78,32 @@ return {
         'ThePrimeagen/vim-be-good',
         event = 'VeryLazy',
         cmd = 'VimBeGood', -- Only load when command is used
+    },
+    {
+        "vuki656/package-info.nvim",
+        event = { "BufEnter package.json" },
+        dependencies = { "MunifTanjim/nui.nvim" },
+        config = function()
+            require("package-info").setup({
+                colors = {
+                    up_to_date = _G.config.colors.success,
+                    outdated = _G.config.colors.warning,
+                    invalid = _G.config.colors.error,
+                },
+                icons = {
+                    enable = true,
+                    style = {
+                        up_to_date = "|  ",
+                        outdated = "|  ",
+                        invalid = "|  ",
+                    },
+                },
+                autostart = true,
+                hide_up_to_date = false,
+                hide_unstable_versions = false,
+                package_manager = "npm",
+            })
+        end,
     },
 }
 

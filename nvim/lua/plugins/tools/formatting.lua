@@ -21,6 +21,7 @@ return {
           css = { 'prettierd' },
           scss = { 'prettierd' },
           svelte = { 'prettierd' },
+          vue = { 'prettierd' },
           -- python = { "isort", "black" },
           -- java = { "google-java-format" },
           go = { 'goimports', 'gofumpt' },

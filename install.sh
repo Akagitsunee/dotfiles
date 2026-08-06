@@ -43,6 +43,11 @@ CLI_TOOL_PACKAGES=(
   "rg ripgrep ripgrep ripgrep ripgrep"
   "tmux tmux tmux tmux tmux"
   "nvim neovim neovim neovim neovim"
+  # Build prerequisite for Mason-managed tools it can't self-install (e.g.
+  # luacheck, which Mason builds via `luarocks make`). Not itself a
+  # Mason-installed binary -- Mason owns LSP servers/linters/formatters,
+  # this only supplies what Mason's build step needs.
+  "luarocks luarocks luarocks luarocks luarocks"
 )
 
 HOME_LINKS=(
