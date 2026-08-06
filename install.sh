@@ -48,6 +48,9 @@ CLI_TOOL_PACKAGES=(
   # Mason-installed binary -- Mason owns LSP servers/linters/formatters,
   # this only supplies what Mason's build step needs.
   "luarocks luarocks luarocks luarocks luarocks"
+  # nvim-treesitter's `main` branch (see nvim/lua/plugins/core/treesitter.lua)
+  # shells out to the tree-sitter CLI to install/update parsers.
+  "tree-sitter tree-sitter-cli tree-sitter-cli tree-sitter-cli tree-sitter-cli"
 )
 
 HOME_LINKS=(

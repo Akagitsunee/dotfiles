@@ -3,7 +3,7 @@ ZSH_DISABLE_COMPFIX=true
 
 # List of frameworks plugins
 plugins=(
-  git docker brew node git-auto-fetch npm autojump
+  git docker brew node git-auto-fetch npm
   git-flow-completion zsh-completions enhancd k
   zsh-autosuggestions zsh-syntax-highlighting tmux
   tmux-cssh tmuxinator zoxide
