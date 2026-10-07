@@ -43,7 +43,7 @@ At minimum:
 - `fd`
 - a Nerd Font
 - a clipboard provider for your OS
-- build tooling for native plugins: `make`, a C compiler, and `cargo`
+- build tooling for native plugins: `make` and a C compiler (`blink.cmp`/`blink.pairs` download prebuilt binaries, so no `cargo`)
 
 Language tooling depends on what you edit, but this config is set up to make use of:
 

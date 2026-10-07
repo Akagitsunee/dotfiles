@@ -2,7 +2,10 @@ return {
   'saghen/blink.cmp',
   event = 'InsertEnter',
   lazy = true,
-  build = 'cargo build --release',
+  -- Pin to a release tag (not `main`) so lazy.nvim downloads the prebuilt
+  -- fuzzy-matcher binary instead of requiring a local Rust/cargo build,
+  -- and so we don't pick up unreleased breaking changes (e.g. the v2 rewrite).
+  version = '1.*',
 
   dependencies = {
     -- Snippet Engine
@@ -33,7 +36,12 @@ return {
       'saghen/blink.pairs',
       event = 'InsertEnter',
       lazy = true,
-      build = 'cargo build --release',
+      dependencies = 'saghen/blink.lib',
+      version = '*',
+      -- download the prebuilt binary from the GitHub release (no cargo needed)
+      build = function()
+        require('blink.pairs').download():pwait(60000)
+      end,
     },
   },
 
