@@ -125,6 +125,8 @@ Node itself is intentionally **not** installed by this repo. `install.sh` clones
 - [`tmux/nord-theme.conf`](tmux/nord-theme.conf) -> `~/.config/tmux/nord-theme.conf`
 - `tmux` itself is auto-installed by `install.sh` if missing (ghostty launches straight into it, so this matters)
 - tmux plugins -> `~/.config/tmux/plugins/`
+- [`tmux/tmux-cheatsheet.md`](tmux/tmux-cheatsheet.md) lists the key bindings (prefix `Ctrl+Space`, `Ctrl+h/j/k/l` navigation shared with nvim)
+- `tmux.conf` enables `focus-events` and `extended-keys` and advertises Ghostty's features (true colour, hyperlinks), so nvim's focus autocmds and modified keys work inside tmux; `ghostty/config` sets `macos-option-as-alt = true`
 - [`tmux-powerline/`](tmux-powerline) -> `~/.config/tmux-powerline/`
 
 ### Browser

@@ -66,8 +66,9 @@ window-padding-balance = true
 background-opacity = 0.96
 background-blur = true
 
+# Treat Option as Alt so Alt+key reaches tmux and nvim (U.S. layout: no special characters lost)
+macos-option-as-alt = true
 # Optional: Uncomment for blur effect (macOS/Linux Wayland)
-# macos-option-as-alt = true
 # background-blur-radius = 20
 
 # Save window state 
