@@ -172,7 +172,10 @@ autocmd({ 'FocusGained', 'BufEnter', 'CursorHold' }, {
   group = groups.file_management,
   desc = 'Check for external file changes and reload if needed',
   callback = function()
-    vim.cmd 'checktime'
+    -- :checktime throws E11 inside the command-line window (q:, q/) and in cmdline mode.
+    if vim.fn.getcmdwintype() == '' and vim.fn.mode() ~= 'c' then
+      vim.cmd 'checktime'
+    end
   end,
 })
 
@@ -189,6 +192,15 @@ autocmd('BufEnter', {
 
     local path = vim.api.nvim_buf_get_name(args.buf)
     if path == '' then
+      return
+    end
+
+    -- Root detection walks up the filesystem; do it once per buffer, not on every BufEnter.
+    local cached = vim.b[args.buf].project_root
+    if cached ~= nil then
+      if cached ~= false and cached ~= vim.fn.getcwd() then
+        vim.api.nvim_set_current_dir(cached)
+      end
       return
     end
 
@@ -219,6 +231,8 @@ autocmd('BufEnter', {
       end
     end
 
+    vim.b[args.buf].project_root = root or false
+
     if root and root ~= vim.fn.getcwd() then
       vim.api.nvim_set_current_dir(root)
     end
@@ -236,7 +250,7 @@ autocmd('BufWritePre', {
   desc = 'Remove trailing whitespace on save for code files',
   callback = function()
     local cursor_pos = vim.api.nvim_win_get_cursor(0)
-    vim.cmd [[%s/\s\+$//e]] -- Remove trailing whitespace
+    vim.cmd [[keeppatterns %s/\s\+$//e]] -- Remove trailing whitespace (keeppatterns: don't touch the search register)
     pcall(vim.api.nvim_win_set_cursor, 0, cursor_pos) -- Restore cursor
   end,
 })
@@ -284,28 +298,49 @@ autocmd('BufWinEnter', {
 -- ⚡ PERFORMANCE OPTIMIZATIONS - Keep Neovim responsive
 -- ============================================================================
 
--- Optimize for large files - disable expensive features
+-- Optimize for large files - disable expensive features.
+--
+-- This used to append FileType/Syntax/BufReadPost/BufReadPre to 'eventignore', but that
+-- option is GLOBAL: after opening one big file those events stayed ignored for every
+-- buffer opened later in the session (no treesitter attach, no LSP, no ftplugins).
+-- Instead mark the buffer and let the features that matter check `vim.b.large_file`
+-- (treesitter attach and conform's format_on_save already do).
 autocmd('BufReadPre', {
   group = groups.performance,
-  desc = 'Optimize settings for large files (>1MB)',
-  callback = function()
+  desc = 'Flag large files (>1MB) so expensive features skip them',
+  callback = function(args)
     local max_filesize = 1024 * 1024 -- 1MB threshold
-    local ok, stats = pcall(vim.uv.fs_stat, vim.api.nvim_buf_get_name(0))
+    local ok, stats = pcall(vim.uv.fs_stat, vim.api.nvim_buf_get_name(args.buf))
 
     if ok and stats and stats.size > max_filesize then
-      -- Disable expensive features for large files
-      vim.opt_local.eventignore:append {
-        'FileType',
-        'Syntax',
-        'BufReadPost',
-        'BufReadPre',
-      }
+      vim.b[args.buf].large_file = true
       vim.opt_local.undolevels = -1 -- Disable undo history
       vim.opt_local.swapfile = false -- Disable swap file
       vim.opt_local.foldmethod = 'manual' -- Simple folding
-      vim.opt_local.syntax = '' -- Disable syntax highlighting
+    end
+  end,
+})
 
+autocmd('BufReadPost', {
+  group = groups.performance,
+  desc = 'Turn off syntax highlighting for flagged large files',
+  callback = function(args)
+    if vim.b[args.buf].large_file then
+      vim.bo[args.buf].syntax = ''
+      pcall(vim.treesitter.stop, args.buf) -- core ftplugins (lua, vim, ...) start it themselves
       vim.notify('Large file detected. Some features disabled for performance.', vim.log.levels.WARN, { title = 'Performance Mode' })
+    end
+  end,
+})
+
+autocmd('LspAttach', {
+  group = groups.performance,
+  desc = 'Do not attach language servers to flagged large files',
+  callback = function(args)
+    if vim.b[args.buf].large_file and args.data and args.data.client_id then
+      vim.schedule(function()
+        vim.lsp.buf_detach_client(args.buf, args.data.client_id)
+      end)
     end
   end,
 })
@@ -338,12 +373,7 @@ autocmd('TermOpen', {
     vim.opt_local.wrap = false -- No line wrapping
 
     vim.cmd 'startinsert' -- Start in insert mode
-
-    -- Easy escape from terminal mode
-    vim.keymap.set('t', '<Esc><Esc>', '<C-\\><C-n>', {
-      buffer = true,
-      desc = 'Exit terminal mode',
-    })
+    -- <Esc><Esc> to leave terminal mode is mapped globally in config/keymaps.lua
   end,
 })
 

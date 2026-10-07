@@ -34,7 +34,7 @@ end
 -- │                         LAZY                            │
 -- ╰─────────────────────────────────────────────────────────╯
 
-keymap('n', '<leader>l', '<cmd>Lazy<cr>', desc_opts 'Lazy Plugin Manager')
+keymap('n', '<leader>ll', '<cmd>Lazy<cr>', desc_opts 'Lazy Plugin Manager')
 keymap('n', '<leader>lc', '<cmd>Lazy check<cr>', desc_opts 'Lazy Check Updates')
 keymap('n', '<leader>lu', '<cmd>Lazy update<cr>', desc_opts 'Lazy Update Plugins')
 keymap('n', '<leader>ls', '<cmd>Lazy sync<cr>', desc_opts 'Lazy Sync Plugins')
@@ -66,8 +66,8 @@ keymap('n', '<S-h>', ':bprevious<CR>', desc_opts 'Go to previous buffer')
 -- =============================================================================
 keymap('n', '<leader>w', ':w<CR>', desc_opts 'Write (Save)')
 keymap('n', '<leader>q', ':q<CR>', desc_opts 'Quit Window')
-keymap('n', '<leader>wq', ':x<CR>', desc_opts 'Write & Quit')
-keymap('n', '<leader>qq', ':qa<CR>', desc_opts 'Quit All')
+keymap('n', '<leader>W', ':x<CR>', desc_opts 'Write & Quit')
+keymap('n', '<leader>Q', ':qa<CR>', desc_opts 'Quit All')
 
 -- =============================================================================
 -- ✍️ TEXT MANIPULATION
@@ -355,7 +355,7 @@ end, desc_opts 'Pick base46 theme')
 -- =============================================================================
 -- 🌈 UI toggles
 -- =============================================================================
-keymap('n', '<leader>ut', ':TransparentToggle<CR>', desc_opts 'Toggle Transparency')
+keymap('n', '<leader>ut', '<cmd>ToggleTransparency<CR>', desc_opts 'Toggle Transparency')
 keymap('n', '<leader>uz', ':ZenMode<CR>', desc_opts 'Toggle Zen Mode')
 keymap('n', '<leader>ur', function()
   vim.wo.relativenumber = not vim.wo.relativenumber
