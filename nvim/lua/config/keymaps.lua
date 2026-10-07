@@ -70,7 +70,7 @@ keymap('n', '<leader>wq', ':x<CR>', desc_opts 'Write & Quit')
 keymap('n', '<leader>qq', ':qa<CR>', desc_opts 'Quit All')
 
 -- =============================================================================
--- פּ TEXT MANIPULATION
+-- ✍️ TEXT MANIPULATION
 -- =============================================================================
 keymap({ 'n', 'v' }, '<leader>ty', '"+y', desc_opts 'Yank to system clipboard')
 keymap('n', '<leader>tY', '"+Y', desc_opts 'Yank line to system clipboard')

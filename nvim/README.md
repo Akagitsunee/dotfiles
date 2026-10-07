@@ -27,7 +27,7 @@ This started from `kickstart.nvim`, but it is no longer documented or organized 
 ├── lua/config/        # bootstrap, options, keymaps, autocmds, globals
 ├── lua/plugins/core/  # lsp, completion, treesitter, debugging
 ├── lua/plugins/editor/# editing, navigation, file management, git
-├── lua/plugins/tools/ # formatting, copilot-chat, utilities, testing
+├── lua/plugins/tools/ # formatting, utilities
 ├── lua/plugins/ui/    # colorscheme, statusline, notifications, interface
 ├── lua/plugins/languages/
 └── after/ftplugin/    # filetype-specific overrides

@@ -5,9 +5,7 @@ _G.config = {
   -- 🎨 VISUAL DESIGN
   ui = {
     border = 'rounded', -- Used by: LSP, Telescope, Which-key, Noice, etc.
-    borderchars = { '─', '│', '─', '│', '╭', '╮', '╯', '╰' }
-      or { '─', '│', '─', '│', '┌', '┐', '┘', '└' }
-      or { '🭽', '▔', '🭾', '▕', '🭿', '▁', '🭼', '▏' },
+    borderchars = { '─', '│', '─', '│', '╭', '╮', '╯', '╰' },
     transparency = 0.9, -- Global transparency level
     blend = 8, -- Popup blend amount
     winblend = 6, -- Window background blend
