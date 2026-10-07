@@ -65,6 +65,7 @@ This repo only keeps personal config and custom files. Third-party dependencies 
 - Oh My Zsh custom plugins -> `~/.oh-my-zsh/custom/plugins/`
 - CLI tools used by the shell config: `zoxide`, `eza`, `bat`, `fd`, `fzf`, `rg`
 - `.zshrc` pins `SSH_AUTH_SOCK` to the static socket `~/.ssh/ssh-agent.sock`, starts an agent there if none answers, and loads keys from the macOS keychain; `tmux.conf` points tmux at the same socket so every pane shares one agent
+- `MANPAGER` pipes through `col -bx` before `bat` so man pages render without backspace overstrike; `~/.local/bin` is prepended last in `.zshenv`, so it wins over the other PATH entries
 - Debian/Ubuntu package names are normalized when needed by linking `batcat` -> `bat` and `fdfind` -> `fd` in `~/.local/bin`
 
 #### Node

@@ -34,7 +34,7 @@ export GPG_TTY=$(tty)
 
 # Pager configuration using 'bat'
 if command -v bat >/dev/null 2>&1; then
-  export MANPAGER="bat -l man -p"
+  export MANPAGER="sh -c 'col -bx | bat -l man -p'"
 elif command -v batcat >/dev/null 2>&1; then
   export MANPAGER="batcat -l man -p"
 fi
@@ -42,7 +42,6 @@ fi
 # =========================================================
 # PATH Configuration
 # =========================================================
-export PATH="$HOME/.local/bin:$PATH"
 export PATH="$CARGO_HOME/bin:$PATH"
 export PATH="$GOBIN:$PATH"
 export PATH="$HOME/go/bin:$PATH"
@@ -52,4 +51,5 @@ elif [[ -d /usr/local/opt/openjdk ]]; then
   export PATH="/usr/local/opt/openjdk/bin:$PATH"
 fi
 export PATH="$HOME/Library/Android/sdk/platform-tools:$PATH"
+export PATH="$HOME/.local/bin:$PATH"
 export PATH="$PATH:$HOME/.spicetify"
