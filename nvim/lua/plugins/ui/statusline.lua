@@ -1,5 +1,6 @@
 return {
   'nvim-lualine/lualine.nvim',
+  event = 'VeryLazy',
   dependencies = { 'nvim-tree/nvim-web-devicons' },
   config = function()
     local lualine = require 'lualine'
@@ -213,16 +214,30 @@ return {
       }
     end
 
+    -- A theme change fires ColorScheme, NvThemeReload and TransparentClear back to
+    -- back; coalesce them so the (expensive) setup() runs once.
+    local rebuild_pending = false
+    local function schedule_setup()
+      if rebuild_pending then
+        return
+      end
+      rebuild_pending = true
+      vim.schedule(function()
+        rebuild_pending = false
+        setup_lualine()
+      end)
+    end
+
     setup_lualine()
     vim.api.nvim_create_autocmd('ColorScheme', {
       group = vim.api.nvim_create_augroup('DynamicLualineTheme', { clear = true }),
       pattern = '*',
-      callback = setup_lualine,
+      callback = schedule_setup,
     })
     vim.api.nvim_create_autocmd('User', {
       group = 'DynamicLualineTheme',
       pattern = { 'NvThemeReload', 'TransparentClear' },
-      callback = setup_lualine,
+      callback = schedule_setup,
     })
   end,
 }

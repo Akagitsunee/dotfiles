@@ -28,16 +28,16 @@ return {
   {
     'neovim/nvim-lspconfig',
     event = { 'BufReadPre', 'BufNewFile' },
-    dependencies = {
-      'williamboman/mason.nvim',
-      'williamboman/mason-lspconfig.nvim',
-      'nvimdev/lspsaga.nvim',
-    },
+    -- mason.nvim and lspsaga are intentionally not dependencies: they load on their own
+    -- triggers (VeryLazy via mason-tool-installer, LspAttach) instead of delaying the
+    -- first buffer. Only the PATH entry mason would add is needed up front.
     config = function(_, opts)
       -- Diagnostic display is configured once, in config/autocmds.lua -- don't
       -- duplicate vim.diagnostic.config() here, it'll race against that call.
 
-      local capabilities = require('blink.cmp').get_lsp_capabilities()
+      local lsp_utils = require 'utils.lsp'
+      lsp_utils.ensure_mason_on_path()
+      local capabilities = lsp_utils.capabilities()
 
       -- Global override for floating preview border
       local orig_util_open_floating_preview = vim.lsp.util.open_floating_preview
@@ -56,11 +56,11 @@ return {
     end,
   },
   {
-    'williamboman/mason-lspconfig.nvim',
+    'mason-org/mason-lspconfig.nvim',
     lazy = true,
   },
   {
-    'williamboman/mason.nvim',
+    'mason-org/mason.nvim',
     build = ':MasonUpdate',
     cmd = 'Mason',
     config = function()
@@ -86,8 +86,22 @@ return {
   },
   {
     'WhoIsSethDaniel/mason-tool-installer.nvim',
-    dependencies = { 'williamboman/mason.nvim' },
-    event = 'VeryLazy',
+    dependencies = { 'mason-org/mason.nvim' },
+    lazy = true,
+    -- Loading mason + mason-lspconfig + the tool installer costs ~100 ms of main-thread
+    -- time. Do it shortly after startup finished instead of competing with it; the
+    -- servers already resolve through $PATH (see utils/lsp.lua).
+    init = function()
+      vim.api.nvim_create_autocmd('User', {
+        pattern = 'VeryLazy',
+        once = true,
+        callback = function()
+          vim.defer_fn(function()
+            require('lazy').load { plugins = { 'mason-tool-installer.nvim' } }
+          end, 1500)
+        end,
+      })
+    end,
     config = function()
       require('mason-tool-installer').setup {
         ensure_installed = with_gated({
@@ -95,7 +109,6 @@ return {
           'eslint_d',
           'prettierd',
           'stylua',
-          'luacheck',
           'shellcheck',
           'shfmt',
           'markdownlint',

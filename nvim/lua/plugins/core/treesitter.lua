@@ -77,7 +77,18 @@ return {
     },
     config = function()
       local ts = require 'nvim-treesitter'
-      ts.install(ensure_installed)
+
+      -- Only hit the installer when a parser is actually missing, and not on the
+      -- startup path.
+      local installed = ts.get_installed()
+      local missing = vim.tbl_filter(function(lang)
+        return not vim.tbl_contains(installed, lang)
+      end, ensure_installed)
+      if #missing > 0 then
+        vim.schedule(function()
+          ts.install(missing)
+        end)
+      end
 
       -- Highlighting, folds and indent are provided by Neovim core once a
       -- parser is attached; nvim-treesitter only ships the queries.
@@ -85,7 +96,7 @@ return {
         -- Skip highlighting/indent for large files (performance)
         local max_filesize = 1024 * 1024
         local ok, stats = pcall(vim.uv.fs_stat, vim.api.nvim_buf_get_name(bufnr))
-        if ok and stats and stats.size > max_filesize then
+        if (ok and stats and stats.size > max_filesize) or vim.b[bufnr].large_file then
           return
         end
 
@@ -188,10 +199,12 @@ return {
       end
 
       local move_keymaps = {
-        goto_next_start = { [']f'] = '@function.outer', [']c'] = '@class.outer', [']a'] = '@parameter.inner' },
-        goto_next_end = { [']F'] = '@function.outer', [']C'] = '@class.outer', [']A'] = '@parameter.inner' },
-        goto_previous_start = { ['[f'] = '@function.outer', ['[c'] = '@class.outer', ['[a'] = '@parameter.inner' },
-        goto_previous_end = { ['[F'] = '@function.outer', ['[C'] = '@class.outer', ['[A'] = '@parameter.inner' },
+        -- Class motions use the classic section keys (]] [[ ][ []) because ]c / [c
+        -- belong to gitsigns' hunk navigation.
+        goto_next_start = { [']f'] = '@function.outer', [']]'] = '@class.outer', [']a'] = '@parameter.inner' },
+        goto_next_end = { [']F'] = '@function.outer', [']['] = '@class.outer', [']A'] = '@parameter.inner' },
+        goto_previous_start = { ['[f'] = '@function.outer', ['[['] = '@class.outer', ['[a'] = '@parameter.inner' },
+        goto_previous_end = { ['[F'] = '@function.outer', ['[]'] = '@class.outer', ['[A'] = '@parameter.inner' },
       }
       for method, keymaps in pairs(move_keymaps) do
         for key, query in pairs(keymaps) do

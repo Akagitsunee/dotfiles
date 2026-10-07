@@ -4,25 +4,20 @@ return {
     -- The filetypes are moved to the top-level ft key for lazy-loading
     ft = { 'html', 'mdx', 'javascript', 'typescript', 'javascriptreact', 'typescriptreact', 'vue', 'svelte' }, --
     opts = function(_, opts)
-      local capabilities = require('blink.cmp').get_lsp_capabilities()
-      capabilities.textDocument.completion.completionItem.snippetSupport = true
-      capabilities.textDocument.colorProvider = { dynamicRegistration = false }
-      capabilities.textDocument.foldingRange = {
-        dynamicRegistration = false,
-        lineFoldingOnly = true,
+      local capabilities = require('utils.lsp').capabilities {
+        textDocument = { colorProvider = { dynamicRegistration = false } },
       }
 
       opts.servers = vim.tbl_deep_extend('force', opts.servers or {}, {
         tailwindcss = {
           capabilities = capabilities,
-          init_options = {
-            userLanguages = {
-              eelixir = 'html-eex',
-              eruby = 'erb',
-            },
-          },
           settings = {
             tailwindCSS = {
+              -- `init_options.userLanguages` is deprecated upstream in favour of this.
+              includeLanguages = {
+                eelixir = 'html-eex',
+                eruby = 'erb',
+              },
               validate = true,
               lint = {
                 cssConflict = 'warning',

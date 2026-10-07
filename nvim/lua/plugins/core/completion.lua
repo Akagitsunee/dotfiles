@@ -19,7 +19,9 @@ return {
       dependencies = { 'rafamadriz/friendly-snippets' },
 
       config = function()
-        require('luasnip.loaders.from_vscode').lazy_load()
+        -- Limit the scan to friendly-snippets; scanning every plugin only produced
+        -- "does not contribute any snippets" warnings (nvim-ufo, ...).
+        require('luasnip.loaders.from_vscode').lazy_load { paths = { vim.fn.stdpath 'data' .. '/lazy/friendly-snippets' } }
       end,
     },
     -- {

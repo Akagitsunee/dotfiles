@@ -76,7 +76,6 @@ return {
   -- Training and utility plugins
   {
     'ThePrimeagen/vim-be-good',
-    event = 'VeryLazy',
     cmd = 'VimBeGood', -- Only load when command is used
   },
   {
@@ -85,10 +84,10 @@ return {
     dependencies = { 'MunifTanjim/nui.nvim' },
     config = function()
       require('package-info').setup {
-        colors = {
-          up_to_date = _G.config.colors.success,
-          outdated = _G.config.colors.warning,
-          invalid = _G.config.colors.error,
+        highlights = {
+          up_to_date = { fg = _G.config.colors.success },
+          outdated = { fg = _G.config.colors.warning },
+          invalid = { fg = _G.config.colors.error },
         },
         icons = {
           enable = true,
