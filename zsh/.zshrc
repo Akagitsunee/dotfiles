@@ -52,6 +52,8 @@ source "$ZDOTDIR/fzf.zsh"
 source "$ZDOTDIR/aliases.zsh"
 source "$ZDOTDIR/bindings.zsh"
 source "$ZDOTDIR/prompt.zsh"
+# Per environment config (privat, work and co) - not pushed
+[[ -f "$ZDOTDIR/environment.zsh" ]] && source "$ZDOTDIR/environment.zsh"
 
 # =========================================================
 # IDE Shell Integrations

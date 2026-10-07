@@ -23,6 +23,10 @@ cd ~/dev/dotfiles
 ./install.sh
 ```
 
+## Machine-specific config
+
+`zsh/environment.zsh` holds per-machine settings (work, private, ...). It is git-ignored and `.zshrc` sources it when present, so create it by hand on each machine.
+
 ## What `install.sh` does
 
 The installer is idempotent. Running it again updates plugin repos and refreshes links.

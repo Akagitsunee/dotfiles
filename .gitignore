@@ -35,3 +35,6 @@ tmp/
 # Installer-managed dependencies
 .oh-my-zsh/
 tmux/plugins/
+
+# Environment dependent files
+zsh/environment.zsh
