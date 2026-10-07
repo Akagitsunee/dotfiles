@@ -27,7 +27,8 @@ main() {
     git clone --depth 1 --branch "$DOTFILES_BRANCH" "$DOTFILES_REPO_URL" "$DOTFILES_DIR"
   fi
 
-  exec "$DOTFILES_DIR/install.sh" "$@"
+  # The repo was just updated; install.sh need not pull again.
+  DOTFILES_SKIP_PULL=1 exec "$DOTFILES_DIR/install.sh" "$@"
 }
 
 main "$@"

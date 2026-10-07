@@ -23,9 +23,21 @@ cd ~/dev/dotfiles
 ./install.sh
 ```
 
+## Installing only parts
+
+Both scripts accept component names (`core zsh nvim tmux terminal firefox`); without arguments everything is handled. `core` always runs first.
+
+```bash
+./install.sh --list
+./install.sh nvim tmux
+./uninstall.sh tmux
+```
+
+Links live in one table, `LINKS` in [`lib/common.sh`](lib/common.sh), shared by both scripts.
+
 ## Machine-specific config
 
-`zsh/environment.zsh` holds per-machine settings (work, private, ...). It is git-ignored and `.zshrc` sources it when present, so create it by hand on each machine.
+`zsh/environment.zsh` holds per-machine settings (work, private, ...). It is git-ignored; `install.sh` creates an empty stub if missing and links it to `~/.config/zsh/environment.zsh`, and `.zshrc` sources it when present. `uninstall.sh` removes the link but keeps the file.
 
 ## What `install.sh` does
 
@@ -41,7 +53,9 @@ It will:
 - on macOS with Homebrew, install `ghostty`, `starship`, `borders`, and the JetBrainsMono Nerd Font if missing
 - install or update tmux plugins in `~/.config/tmux/plugins`
 - sync the ShyFox theme into the Firefox profile and link `user.js` (see [Browser](#browser))
+- create the git-ignored `zsh/environment.zsh` stub if it is missing (see [Machine-specific config](#machine-specific-config))
 - symlink the configs from this repo into `~` and `~/.config`
+- only handle the components you name, if you name any (see [Installing only parts](#installing-only-parts))
 
 ### Prerequisites not automated
 
@@ -128,8 +142,9 @@ Node itself is intentionally **not** installed by this repo. `install.sh` clones
 ## Notes
 
 - Existing files are moved out of the way before links are created.
-- `stow.sh` and `unstow.sh` are compatibility wrappers around `install.sh` and `uninstall.sh`.
 - The bootstrap command needs `git` and network access.
+- `DOTFILES_BACKUP_DIR` overrides where backups go; `bootstrap.sh` sets `DOTFILES_SKIP_PULL=1` so the repo isn't pulled a second time by `install.sh`.
+- Shared helpers (paths, logging, the link table, Firefox profile lookup) live in [`lib/common.sh`](lib/common.sh).
 - `DOTFILES_DIR`, `DOTFILES_REPO_URL`, and `DOTFILES_BRANCH` can be set before running `bootstrap.sh`.
 
 ## Uninstall
@@ -139,4 +154,4 @@ cd ~/dev/dotfiles
 ./uninstall.sh
 ```
 
-This removes symlinks created by the repo. It does not remove `~/.oh-my-zsh`, installed CLI tools, or downloaded tmux plugins.
+Pass component names to remove only those links (`./uninstall.sh tmux`). This removes symlinks created by the repo. It does not remove `~/.oh-my-zsh`, installed CLI tools, downloaded tmux plugins, your `zsh/environment.zsh`, or the copied Firefox `chrome/` directory.

@@ -1,24 +1,11 @@
 #!/usr/bin/env bash
+# Usage: ./uninstall.sh [component...]   (see ./uninstall.sh --list; default: all)
 set -euo pipefail
 
-DOTFILES_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
-CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}"
+# shellcheck source=lib/common.sh
+. "$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)/lib/common.sh"
 
-TARGETS=(
-  "$HOME/.zprofile"
-  "$HOME/.zshenv"
-  "$HOME/.wezterm.lua"
-  "$CONFIG_DIR/aerospace"
-  "$CONFIG_DIR/ghostty"
-  "$CONFIG_DIR/nvim"
-  "$CONFIG_DIR/starship.toml"
-  "$CONFIG_DIR/tmux/tmux.conf"
-  "$CONFIG_DIR/tmux/onedark-theme.conf"
-  "$CONFIG_DIR/tmux/nord-theme.conf"
-  "$CONFIG_DIR/tmux-powerline"
-  "$CONFIG_DIR/wezterm"
-)
-
+# Only removes symlinks that point into this repo; anything else is left alone.
 remove_link() {
   local target_path="$1"
   local resolved_target
@@ -31,19 +18,22 @@ remove_link() {
   case "$resolved_target" in
     "$DOTFILES_DIR"/*)
       rm "$target_path"
-      printf 'Removed %s\n' "$target_path"
+      log "Removed $target_path"
       ;;
     *)
-      printf 'Skipped %s (not managed by this repo)\n' "$target_path"
+      log "Skipped $target_path (not managed by this repo)"
       ;;
   esac
 }
+
+# each_link callback: arguments are (target, source).
+remove_row() { remove_link "$1"; }
 
 remove_managed_links_in_dir() {
   local target_dir="$1"
   local target_path
 
-  [ -d "$target_dir" ] || return
+  [ -d "$target_dir" ] || return 0
 
   shopt -s nullglob dotglob
   for target_path in "$target_dir"/*; do
@@ -52,30 +42,10 @@ remove_managed_links_in_dir() {
   shopt -u nullglob dotglob
 }
 
-firefox_profile_dir() {
-  local base_dir profile_dirs=()
-
-  case "$(uname -s)" in
-    Darwin) base_dir="$HOME/Library/Application Support/Firefox/Profiles" ;;
-    *) base_dir="$HOME/.mozilla/firefox" ;;
-  esac
-
-  [ -d "$base_dir" ] || return
-
-  shopt -s nullglob
-  profile_dirs=("$base_dir"/*.default-release)
-  shopt -u nullglob
-
-  [ "${#profile_dirs[@]}" -eq 1 ] || return
-
-  printf '%s\n' "${profile_dirs[0]}"
-}
-
 remove_firefox_links() {
   local profile_dir
 
-  profile_dir="$(firefox_profile_dir)"
-  [ -n "$profile_dir" ] || return
+  profile_dir="$(firefox_profile_dir 2>/dev/null)" || return 0
 
   # chrome/ is a synced copy, not a symlink (see install.sh), so remove_link's
   # symlink check intentionally leaves it in place -- uninstalling shouldn't
@@ -85,16 +55,23 @@ remove_firefox_links() {
 }
 
 main() {
-  local target_path
+  local component
 
-  for target_path in "${TARGETS[@]}"; do
-    remove_link "$target_path"
+  parse_components "$@"
+
+  for component in "${SELECTED[@]}"; do
+    each_link "$component" remove_row
   done
 
-  remove_managed_links_in_dir "$CONFIG_DIR/zsh"
-  remove_firefox_links
+  # The per-machine environment.zsh link is covered here; the file itself stays.
+  if is_selected zsh; then
+    remove_managed_links_in_dir "$CONFIG_DIR/zsh"
+  fi
+  if is_selected firefox; then
+    remove_firefox_links
+  fi
 
-  printf 'Uninstall complete.\n'
+  log "Uninstall complete."
 }
 
 main "$@"
