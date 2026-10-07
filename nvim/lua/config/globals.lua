@@ -7,8 +7,10 @@ _G.config = {
     border = 'rounded', -- Used by: LSP, Telescope, Which-key, Noice, etc.
     borderchars = { '─', '│', '─', '│', '╭', '╮', '╯', '╰' },
     transparency = 0.9, -- Global transparency level
-    blend = 8, -- Popup blend amount
-    winblend = 6, -- Window background blend
+    -- Keep floats fully opaque: with blend > 0 the blank cells of a float let the
+    -- text underneath bleed through (pickers, Lazy, which-key, completion menu).
+    blend = 0, -- Popup (pum) blend amount
+    winblend = 0, -- Floating window blend
   },
 
   -- 🌈 COLOR SYSTEM

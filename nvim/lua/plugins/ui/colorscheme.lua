@@ -19,8 +19,22 @@ local function hl(name)
   }
 end
 
+-- base46's palette for the active theme. Used for the colours that must stay opaque:
+-- base46 itself blanks NormalFloat/NvimTreeNormal/... when its transparency flag is on,
+-- so reading them back from the highlight groups would return nothing.
+local function theme_palette()
+  local ok, base46 = pcall(require, 'base46')
+  if not ok then
+    return {}
+  end
+
+  local ok_tb, palette = pcall(base46.get_theme_tb, 'base_30')
+  return ok_tb and palette or {}
+end
+
 local function resolve_ui_colors()
   local fallback = (_G.config and _G.config.colors) or {}
+  local palette = theme_palette()
   local normal = hl 'Normal'
   local normal_float = hl 'NormalFloat'
   local line_nr = hl 'LineNr'
@@ -35,9 +49,9 @@ local function resolve_ui_colors()
   local hint = hl 'DiagnosticSignHint'
 
   return {
-    bg = normal.bg or fallback.bg,
-    panel = normal_float.bg or fallback.panel or normal.bg,
-    surface = hl('CursorLine').bg or fallback.surface or normal_float.bg or normal.bg,
+    bg = normal.bg or palette.black or fallback.bg,
+    panel = palette.darker_black or normal_float.bg or fallback.panel or normal.bg,
+    surface = palette.black2 or hl('CursorLine').bg or fallback.surface or normal_float.bg or normal.bg,
     subtle = separator.fg or fallback.subtle or comment.fg,
     fg = normal.fg or fallback.fg,
     muted = comment.fg or fallback.muted or line_nr.fg,
@@ -107,34 +121,24 @@ local function apply_base46_theme(theme, opts)
   end
   _G.refresh_theme_ui()
   pcall(function()
-    require('config.theme_sync').sync_current_theme()
+    require('config.theme_sync').request_sync()
   end)
   if opts.notify then
     vim.notify('Theme switched to ' .. theme, vim.log.levels.INFO, { title = 'base46' })
   end
 end
 
-local function refresh_theme_ui()
-  require('base46').load_all_highlights()
-
-  local ok, transparent = pcall(require, 'transparent')
-  if ok then
-    vim.g.transparent_enabled = _G.config.theme.transparent_background
-    if _G.config.theme.transparent_background then
-      transparent.clear()
-      return
-    end
-  end
-
-  apply_ui_highlights()
-end
-
 local function apply_ui_highlights()
   local colors = resolve_ui_colors()
   local transparent = _G.config and _G.config.theme and _G.config.theme.transparent_background
-  local panel_bg = transparent and 'NONE' or colors.panel
-  local float_bg = transparent and 'NONE' or colors.panel
-  local surface_bg = transparent and 'NONE' or colors.surface
+  -- Floating windows (pickers, which-key, noice, notify, ...) must stay opaque even
+  -- when the editor background is transparent, otherwise the text behind them shows
+  -- through. Only splits (nvim-tree, statusline, winbar, signs) follow the transparency.
+  local panel_bg = colors.panel
+  local float_bg = colors.panel
+  local surface_bg = colors.surface
+  local split_bg = transparent and 'NONE' or colors.panel
+  local split_surface_bg = transparent and 'NONE' or colors.surface
 
   local highlights = {
     NormalFloat = { bg = float_bg, fg = colors.fg },
@@ -164,7 +168,7 @@ local function apply_ui_highlights()
     NoiceCmdlineIconSearch = { fg = colors.warning, bg = float_bg },
     NoiceConfirm = { fg = colors.fg, bg = float_bg },
     NoiceConfirmBorder = { fg = colors.primary, bg = float_bg },
-    NoiceMini = { fg = colors.fg, bg = transparent and 'NONE' or colors.bg },
+    NoiceMini = { fg = colors.fg, bg = float_bg },
     NotifyBackground = { bg = float_bg },
 
     SnacksPicker = { fg = colors.fg, bg = float_bg },
@@ -196,23 +200,23 @@ local function apply_ui_highlights()
     SnacksPickerGitStatusIgnored = { fg = colors.muted },
     SnacksPickerGitStatusUnmerged = { fg = colors.error },
 
-    NvimTreeNormal = { fg = colors.fg, bg = panel_bg },
-    NvimTreeNormalNC = { fg = colors.fg, bg = panel_bg },
-    NvimTreeEndOfBuffer = { fg = colors.panel, bg = panel_bg },
-    NvimTreeWinSeparator = { fg = colors.subtle, bg = panel_bg },
-    NvimTreeCursorLine = { bg = surface_bg },
-    NvimTreeRootFolder = { fg = colors.primary, bg = panel_bg, bold = true },
-    NvimTreeFolderName = { fg = colors.fg, bg = panel_bg },
-    NvimTreeOpenedFolderName = { fg = colors.primary, bg = panel_bg, bold = true },
-    NvimTreeEmptyFolderName = { fg = colors.muted, bg = panel_bg },
-    NvimTreeFolderIcon = { fg = colors.primary, bg = panel_bg },
-    NvimTreeFolderArrowClosed = { fg = colors.subtle, bg = panel_bg },
-    NvimTreeFolderArrowOpen = { fg = colors.subtle, bg = panel_bg },
-    NvimTreeSpecialFile = { fg = colors.info, bg = panel_bg, underline = true },
-    NvimTreeGitDirty = { fg = colors.warning, bg = panel_bg },
-    NvimTreeGitNew = { fg = colors.success, bg = panel_bg },
-    NvimTreeGitDeleted = { fg = colors.error, bg = panel_bg },
-    NvimTreeIndentMarker = { fg = colors.subtle, bg = panel_bg },
+    NvimTreeNormal = { fg = colors.fg, bg = split_bg },
+    NvimTreeNormalNC = { fg = colors.fg, bg = split_bg },
+    NvimTreeEndOfBuffer = { fg = colors.panel, bg = split_bg },
+    NvimTreeWinSeparator = { fg = colors.subtle, bg = split_bg },
+    NvimTreeCursorLine = { bg = split_surface_bg },
+    NvimTreeRootFolder = { fg = colors.primary, bg = split_bg, bold = true },
+    NvimTreeFolderName = { fg = colors.fg, bg = split_bg },
+    NvimTreeOpenedFolderName = { fg = colors.primary, bg = split_bg, bold = true },
+    NvimTreeEmptyFolderName = { fg = colors.muted, bg = split_bg },
+    NvimTreeFolderIcon = { fg = colors.primary, bg = split_bg },
+    NvimTreeFolderArrowClosed = { fg = colors.subtle, bg = split_bg },
+    NvimTreeFolderArrowOpen = { fg = colors.subtle, bg = split_bg },
+    NvimTreeSpecialFile = { fg = colors.info, bg = split_bg, underline = true },
+    NvimTreeGitDirty = { fg = colors.warning, bg = split_bg },
+    NvimTreeGitNew = { fg = colors.success, bg = split_bg },
+    NvimTreeGitDeleted = { fg = colors.error, bg = split_bg },
+    NvimTreeIndentMarker = { fg = colors.subtle, bg = split_bg },
 
     DiagnosticSignError = { fg = colors.error, bg = transparent and 'NONE' or colors.bg },
     DiagnosticSignWarn = { fg = colors.warning, bg = transparent and 'NONE' or colors.bg },
@@ -225,7 +229,53 @@ local function apply_ui_highlights()
   end
 end
 
+-- Stamp of what the compiled base46 cache was built for. Kept outside the cache
+-- directory because every file in there is sourced at startup.
+local function theme_stamp()
+  return table.concat({ require('nvconfig').base46.theme, tostring(_G.config.theme.transparent_background) }, '|')
+end
+
+local function stamp_path()
+  return vim.fn.stdpath 'state' .. '/base46.stamp'
+end
+
+local function cache_is_fresh()
+  if not vim.uv.fs_stat(vim.g.base46_cache .. 'defaults') then
+    return false
+  end
+
+  local ok, lines = pcall(vim.fn.readfile, stamp_path())
+  return ok and lines[1] == theme_stamp()
+end
+
+-- Cheap, idempotent: restyles the UI on top of whatever base46 highlights are loaded.
+-- The transparent.nvim plugin is only loaded when transparency is actually wanted.
+local function apply_theme_overrides()
+  if _G.config.theme.transparent_background or vim.g.transparent_enabled then
+    local ok, transparent = pcall(require, 'transparent')
+    if ok then
+      vim.g.transparent_enabled = _G.config.theme.transparent_background
+      if _G.config.theme.transparent_background then
+        transparent.clear()
+        return
+      end
+    end
+  end
+
+  apply_ui_highlights()
+end
+
+-- Expensive: recompiles every base46 highlight file and reloads them. Only needed
+-- when the theme/transparency changes or the cache is missing -- not on every start.
+local function refresh_theme_ui()
+  require('nvconfig').base46.transparency = _G.config.theme.transparent_background
+  require('base46').load_all_highlights()
+  pcall(vim.fn.writefile, { theme_stamp() }, stamp_path())
+  apply_theme_overrides()
+end
+
 _G.apply_ui_highlights = apply_ui_highlights
+_G.apply_theme_overrides = apply_theme_overrides
 _G.refresh_theme_ui = refresh_theme_ui
 _G.set_base46_theme = function(theme)
   apply_base46_theme(theme, { persist = true, notify = true })
@@ -287,35 +337,17 @@ end
 return {
   {
     'xiyaowong/transparent.nvim',
-    lazy = false,
+    -- Only needed while transparency is on; apply_theme_overrides() requires it on demand.
+    lazy = not _G.config.theme.transparent_background,
     priority = 900,
     config = function()
       require('transparent').setup {
+        -- Floating windows are deliberately NOT listed: they must stay opaque.
         extra_groups = {
-          'NormalFloat',
-          'FloatBorder',
-          'FloatTitle',
           'WinBar',
           'WinBarNC',
           'StatusLine',
           'StatusLineNC',
-          'WhichKeyNormal',
-          'WhichKeyFloat',
-          'WhichKeyBorder',
-          'WhichKeyTitle',
-          'NoiceCmdlinePopup',
-          'NoiceCmdlinePopupBorder',
-          'NoiceCmdlinePopupTitle',
-          'NoiceConfirm',
-          'NoiceConfirmBorder',
-          'NotifyBackground',
-          'SnacksPicker',
-          'SnacksPickerBox',
-          'SnacksPickerList',
-          'SnacksPickerListCursorLine',
-          'SnacksPickerPreview',
-          'SnacksPickerPreviewCursorLine',
-          'SnacksPickerInput',
           'NvimTreeNormal',
           'NvimTreeNormalNC',
           'NvimTreeEndOfBuffer',
@@ -325,11 +357,7 @@ return {
         on_clear = function()
           local transparent = require 'transparent'
           transparent.clear_prefix 'lualine'
-          transparent.clear_prefix 'WhichKey'
-          transparent.clear_prefix 'Noice'
-          transparent.clear_prefix 'Notify'
           transparent.clear_prefix 'NvimTree'
-          transparent.clear_prefix 'Snacks'
           if _G.apply_ui_highlights then
             vim.schedule(_G.apply_ui_highlights)
           end
@@ -346,9 +374,6 @@ return {
       refresh_theme_ui()
     end,
     config = function()
-      refresh_theme_ui()
-      require('config.theme_sync').setup()
-
       vim.api.nvim_create_autocmd('User', {
         group = vim.api.nvim_create_augroup('DynamicBase46Ui', { clear = true }),
         pattern = 'NvThemeReload',
@@ -357,10 +382,17 @@ return {
             apply_ui_highlights()
           end
           pcall(function()
-            require('config.theme_sync').sync_current_theme()
+            require('config.theme_sync').request_sync()
           end)
         end,
       })
+
+      -- config/init.lua sources the compiled cache and then calls
+      -- apply_theme_overrides(); a full recompile is only needed when it is stale.
+      if not cache_is_fresh() then
+        refresh_theme_ui()
+      end
+      require('config.theme_sync').setup()
     end,
   },
 }

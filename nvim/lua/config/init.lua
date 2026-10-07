@@ -64,14 +64,9 @@ end
 
 _G.install_notify_logger(vim.notify)
 
-vim.api.nvim_create_autocmd('VimLeavePre', {
-  group = vim.api.nvim_create_augroup('ConfigErrorLogging', { clear = true }),
-  callback = function()
-    if vim.v.errmsg ~= '' then
-      append_error_log(vim.v.errmsg, vim.log.levels.ERROR, { title = 'vim.v.errmsg' })
-    end
-  end,
-})
+-- Note: v:errmsg is deliberately not logged on exit. It only holds the *last* error
+-- message of the session (typos like E486, `silent!` commands, E216 FileExplorer from
+-- oil/nvim-tree because netrw is disabled, ...), which is noise, not a real failure.
 
 vim.g.base46_cache = vim.fn.stdpath 'config' .. '/.base46_cache/'
 
@@ -82,6 +77,11 @@ if vim.fn.isdirectory(vim.g.base46_cache) == 1 then
   for _, file in ipairs(vim.fn.readdir(vim.g.base46_cache)) do
     pcall(dofile, vim.g.base46_cache .. file)
   end
+end
+
+-- Restyle floats/statusline/etc. on top of the freshly sourced base46 highlights.
+if _G.apply_theme_overrides then
+  _G.apply_theme_overrides()
 end
 
 -- Load core configuration

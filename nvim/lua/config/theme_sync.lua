@@ -16,6 +16,16 @@ local GHOSTTY_THEME_NAME = 'NvimSync'
 local TMUX_POWERLINE_THEME_NAME = 'dynamic_bubble'
 
 local augroup = nil
+local sync_timer = nil
+
+-- Only touch the terminal-side files for terminals that can actually use them.
+local function in_ghostty()
+  return vim.env.TERM_PROGRAM == 'ghostty' or vim.env.GHOSTTY_RESOURCES_DIR ~= nil
+end
+
+local function in_tmux()
+  return vim.env.TMUX ~= nil and vim.fn.executable 'tmux' == 1
+end
 
 local function hex(value)
   if type(value) == 'number' then
@@ -58,6 +68,10 @@ local function read_file(path)
 end
 
 local function write_file(path, content)
+  -- Skip identical content so unchanged runs don't dirty files (or the git tree).
+  if read_file(path) == content then
+    return
+  end
   vim.fn.mkdir(vim.fs.dirname(path), 'p')
   local lines = vim.split(content, '\n', { plain = true })
   vim.fn.writefile(lines, path)
@@ -131,8 +145,10 @@ local function replace_first_matching_line(path, matcher, replacement)
   local lines = vim.fn.readfile(path)
   for i, line in ipairs(lines) do
     if matcher(line) then
-      lines[i] = replacement
-      vim.fn.writefile(lines, path)
+      if line ~= replacement then
+        lines[i] = replacement
+        vim.fn.writefile(lines, path)
+      end
       return true
     end
   end
@@ -267,7 +283,7 @@ local function tmux_colors_content(colors)
 end
 
 local function refresh_tmux_clients()
-  if vim.fn.executable 'tmux' ~= 1 then
+  if not in_tmux() then
     return
   end
 
@@ -314,12 +330,7 @@ local function capture_tmux_conf_option_line(option)
 end
 
 local function tmux_has_server()
-  if vim.fn.executable 'tmux' ~= 1 then
-    return false
-  end
-
-  local result = vim.system({ 'tmux', 'list-clients' }, { text = true }):wait()
-  return result.code == 0
+  return in_tmux()
 end
 
 local function tmux_show_option(option)
@@ -327,7 +338,7 @@ local function tmux_show_option(option)
     return nil
   end
 
-  local result = vim.system({ 'tmux', 'show-options', '-gqv', option }, { text = true }):wait()
+  local result = vim.system({ 'tmux', 'show-options', '-gqv', option }, { text = true }):wait(500)
   if result.code ~= 0 then
     return nil
   end
@@ -362,19 +373,23 @@ local function snapshot_originals(state)
 end
 
 local function apply_external_theme(colors)
-  write_file(GHOSTTY_THEME_PATH, ghostty_theme_content(colors))
+  if in_ghostty() then
+    write_file(GHOSTTY_THEME_PATH, ghostty_theme_content(colors))
 
-  replace_first_matching_line(GHOSTTY_CONFIG_PATH, function(line)
-    return line:match '^%s*theme%s*=' ~= nil
-  end, ('theme = %s'):format(GHOSTTY_THEME_NAME))
+    replace_first_matching_line(GHOSTTY_CONFIG_PATH, function(line)
+      return line:match '^%s*theme%s*=' ~= nil
+    end, ('theme = %s'):format(GHOSTTY_THEME_NAME))
+  end
 
-  replace_first_matching_line(TMUX_POWERLINE_CONFIG_PATH, function(line)
-    return line:match '^%s*export%s+TMUX_POWERLINE_THEME=' ~= nil
-  end, ('export TMUX_POWERLINE_THEME="%s"'):format(TMUX_POWERLINE_THEME_NAME))
+  if in_tmux() then
+    replace_first_matching_line(TMUX_POWERLINE_CONFIG_PATH, function(line)
+      return line:match '^%s*export%s+TMUX_POWERLINE_THEME=' ~= nil
+    end, ('export TMUX_POWERLINE_THEME="%s"'):format(TMUX_POWERLINE_THEME_NAME))
 
-  write_file(TMUX_POWERLINE_COLORS_PATH, tmux_colors_content(colors))
-  tmux_set_option('status-style', ('bg=%s,fg=%s'):format(colors.panel, colors.fg))
-  refresh_tmux_clients()
+    write_file(TMUX_POWERLINE_COLORS_PATH, tmux_colors_content(colors))
+    tmux_set_option('status-style', ('bg=%s,fg=%s'):format(colors.panel, colors.fg))
+    refresh_tmux_clients()
+  end
 end
 
 local function restore_originals(state)
@@ -423,6 +438,12 @@ local function current_pid_key()
 end
 
 function M.sync_current_theme()
+  -- Headless runs (scripts, :checkhealth CI, ...) have nothing to theme and
+  -- used to leave stale PIDs behind plus modified tracked files.
+  if #vim.api.nvim_list_uis() == 0 or not (in_ghostty() or in_tmux()) then
+    return
+  end
+
   local state = load_state()
   active_pid_count(state)
   if next(state.pids) == nil and next(state.original or {}) ~= nil then
@@ -434,6 +455,23 @@ function M.sync_current_theme()
   state.pids[current_pid_key()] = true
   apply_external_theme(build_palette())
   save_state(state)
+end
+
+-- Debounced entry point: theme changes fire several events in a row.
+function M.request_sync()
+  if sync_timer then
+    sync_timer:stop()
+  else
+    sync_timer = assert(vim.uv.new_timer())
+  end
+
+  sync_timer:start(
+    300,
+    0,
+    vim.schedule_wrap(function()
+      pcall(M.sync_current_theme)
+    end)
+  )
 end
 
 function M.teardown()
@@ -464,9 +502,7 @@ function M.setup()
     end,
   })
 
-  vim.schedule(function()
-    pcall(M.sync_current_theme)
-  end)
+  M.request_sync()
 end
 
 return M
