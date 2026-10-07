@@ -1,3 +1,5 @@
+config-version = 2
+
 after-login-command = []
 after-startup-command = [
   'exec-and-forget borders active_color=gradient(color1=0xff89b4fa,color2=0xffcba6f7,angle=45) inactive_color=0xff313244 width=4.0 style=round blur_radius=5.0'
