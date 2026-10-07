@@ -1,7 +1,7 @@
 -- Load options and globalstatus
-require('config.globals')
+require 'config.globals'
 
-local log_dir = vim.fn.stdpath('config') .. '/.logs'
+local log_dir = vim.fn.stdpath 'config' .. '/.logs'
 local log_file = log_dir .. '/nvim-errors.log'
 
 local function level_name(level)
@@ -26,7 +26,7 @@ local function append_error_log(message, level, opts)
     vim.fn.mkdir(log_dir, 'p')
 
     local title = opts and opts.title and (' [' .. opts.title .. ']') or ''
-    local header = string.format('%s [%s]%s', os.date('%Y-%m-%d %H:%M:%S'), level_name(level), title)
+    local header = string.format('%s [%s]%s', os.date '%Y-%m-%d %H:%M:%S', level_name(level), title)
     local lines = vim.split(tostring(message), '\n', { plain = true })
     table.insert(lines, 1, header)
     table.insert(lines, '')
@@ -76,7 +76,7 @@ vim.api.nvim_create_autocmd('VimLeavePre', {
 vim.g.base46_cache = vim.fn.stdpath 'config' .. '/.base46_cache/'
 
 -- Bootstrap lazy.nvim
-require('config.lazy')
+require 'config.lazy'
 
 if vim.fn.isdirectory(vim.g.base46_cache) == 1 then
   for _, file in ipairs(vim.fn.readdir(vim.g.base46_cache)) do
@@ -85,8 +85,8 @@ if vim.fn.isdirectory(vim.g.base46_cache) == 1 then
 end
 
 -- Load core configuration
-require('config.options')
-require('config.keymaps')
-require('config.autocmds')
+require 'config.options'
+require 'config.keymaps'
+require 'config.autocmds'
 
 -- vim: ts=2 sts=2 sw=2 et

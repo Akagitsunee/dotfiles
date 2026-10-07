@@ -1,7 +1,7 @@
 return {
   {
-    "neovim/nvim-lspconfig",
-    ft = { "go", "gomod", "gowork", "gosum" },
+    'neovim/nvim-lspconfig',
+    ft = { 'go', 'gomod', 'gowork', 'gosum' },
     opts = {
       servers = {
         gopls = {
@@ -11,7 +11,7 @@ return {
               usePlaceholders = true,
               completeUnimported = true,
               staticcheck = true,
-              directoryFilters = { "-.git", "-.vscode", "-.idea", "-.vscode-test", "-node_modules" },
+              directoryFilters = { '-.git', '-.vscode', '-.idea', '-.vscode-test', '-node_modules' },
               semanticTokens = true,
               codelenses = {
                 gc_details = false,

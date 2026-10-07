@@ -8,15 +8,15 @@ return {
     -- Snippet Engine
     {
       'L3MON4D3/LuaSnip',
-      event = "InsertEnter",
+      event = 'InsertEnter',
       version = '2.*',
       lazy = true,
-      build = "make install_jsregexp",
+      build = 'make install_jsregexp',
 
       dependencies = { 'rafamadriz/friendly-snippets' },
 
       config = function()
-        require("luasnip.loaders.from_vscode").lazy_load()
+        require('luasnip.loaders.from_vscode').lazy_load()
       end,
     },
     -- {
@@ -33,7 +33,7 @@ return {
       'saghen/blink.pairs',
       event = 'InsertEnter',
       lazy = true,
-      build = 'cargo build --release'
+      build = 'cargo build --release',
     },
   },
 
@@ -45,7 +45,7 @@ return {
     require('blink.cmp').setup(opts)
 
     -- Setup blink.pairs
-    require('blink.pairs').setup({
+    require('blink.pairs').setup {
       mappings = {
         enabled = true,
         -- ADHD-friendly settings
@@ -53,12 +53,12 @@ return {
 
         -- Default pairs
         pairs = {
-          ["("] = ")",
-          ["["] = "]",
-          ["{"] = "}",
+          ['('] = ')',
+          ['['] = ']',
+          ['{'] = '}',
           ['"'] = '"',
           ["'"] = "'",
-          ["`"] = "`",
+          ['`'] = '`',
         },
       },
       highlights = {
@@ -74,7 +74,7 @@ return {
         },
       },
       debug = false,
-    })
+    }
   end,
 
   ---@module 'blink.cmp'
@@ -83,14 +83,14 @@ return {
     keymap = {
       preset = 'super-tab',
       -- Better ADHD-friendly navigation
-      ["<C-k>"] = { "select_prev", "fallback" },
-      ["<C-j>"] = { "select_next", "fallback" },
-      ["<C-u>"] = { "scroll_documentation_up", "fallback" },
-      ["<C-d>"] = { "scroll_documentation_down", "fallback" },
-      ["<C-e>"] = { "cancel", "fallback" },
-      ["<Esc>"] = { "cancel", "fallback" },
+      ['<C-k>'] = { 'select_prev', 'fallback' },
+      ['<C-j>'] = { 'select_next', 'fallback' },
+      ['<C-u>'] = { 'scroll_documentation_up', 'fallback' },
+      ['<C-d>'] = { 'scroll_documentation_down', 'fallback' },
+      ['<C-e>'] = { 'cancel', 'fallback' },
+      ['<Esc>'] = { 'cancel', 'fallback' },
       -- Quick accept with Ctrl+Space
-      ["<C-Space>"] = { "accept", "fallback" },
+      ['<C-Space>'] = { 'accept', 'fallback' },
     },
 
     appearance = {
@@ -123,7 +123,7 @@ return {
         --},
 
         buffer = {
-          name = "buffer",
+          name = 'buffer',
           max_items = 5, -- Limit buffer suggestions
           opts = {
             get_bufnrs = function()
@@ -135,7 +135,7 @@ return {
       },
     },
 
-    fuzzy = { implementation = "prefer_rust_with_warning" },
+    fuzzy = { implementation = 'prefer_rust_with_warning' },
 
     completion = {
       trigger = {
@@ -150,17 +150,17 @@ return {
         border = _G.config.ui.border,
         draw = {
           columns = {
-            { "label",     "label_description", gap = 1 },
-            { "kind_icon", "kind",              gap = 1 }
+            { 'label', 'label_description', gap = 1 },
+            { 'kind_icon', 'kind', gap = 1 },
           },
-          treesitter = { "lsp" }, -- Better syntax highlighting
+          treesitter = { 'lsp' }, -- Better syntax highlighting
         },
       },
 
       accept = {
         auto_brackets = {
           enabled = true,
-          force_allow_filetypes = { "typescript", "javascript", "lua" },
+          force_allow_filetypes = { 'typescript', 'javascript', 'lua' },
         },
       },
 
@@ -192,8 +192,7 @@ return {
       },
     },
   },
-  opts_extend = { "sources.default" },
+  opts_extend = { 'sources.default' },
 }
-
 
 -- vim: ts=2 sts=2 sw=2 et

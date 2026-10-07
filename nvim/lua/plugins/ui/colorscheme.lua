@@ -76,8 +76,8 @@ local function persist_base46_theme(theme)
   local lines = vim.fn.readfile(path)
 
   for i, line in ipairs(lines) do
-    if line:match("^%s*theme%s*=%s*['\"].-['\"],?%s*$") then
-      lines[i] = line:gsub("(['\"]).-%1", string.format("'%s'", theme), 1)
+    if line:match '^%s*theme%s*=%s*[\'"].-[\'"],?%s*$' then
+      lines[i] = line:gsub('([\'"]).-%1', string.format("'%s'", theme), 1)
       break
     end
   end
@@ -248,12 +248,16 @@ _G.pick_base46_theme = function()
     end
 
     stop_preview_timer()
-    preview_timer:start(120, 0, vim.schedule_wrap(function()
-      if theme ~= previewed then
-        apply_base46_theme(theme, { persist = false, notify = false })
-        previewed = theme
-      end
-    end))
+    preview_timer:start(
+      120,
+      0,
+      vim.schedule_wrap(function()
+        if theme ~= previewed then
+          apply_base46_theme(theme, { persist = false, notify = false })
+          previewed = theme
+        end
+      end)
+    )
   end
 
   require('snacks').picker.select(themes, {

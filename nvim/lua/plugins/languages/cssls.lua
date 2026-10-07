@@ -1,7 +1,7 @@
 return {
   {
-    "neovim/nvim-lspconfig",
-    ft = { "css", "scss", "less" }, -- Triggers on CSS and pre-processor files
+    'neovim/nvim-lspconfig',
+    ft = { 'css', 'scss', 'less' }, -- Triggers on CSS and pre-processor files
     opts = {
       servers = {
         cssls = {
@@ -9,12 +9,12 @@ return {
           settings = { --
             css = {
               lint = {
-                unknownAtRules = "ignore",
+                unknownAtRules = 'ignore',
               },
             },
             scss = {
               lint = {
-                unknownAtRules = "ignore",
+                unknownAtRules = 'ignore',
               },
             },
           },

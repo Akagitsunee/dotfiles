@@ -409,9 +409,7 @@ local function restore_originals(state)
   if type(original.tmux_status_style) == 'string' and original.tmux_status_style ~= '' then
     tmux_set_option('status-style', original.tmux_status_style)
   elseif original.tmux_status_style_line ~= vim.NIL and type(original.tmux_status_style_line) == 'string' then
-    local value = original.tmux_status_style_line
-      :gsub('^%s*set%-option%s+%-g%s+status%-style%s+', '', 1)
-      :gsub('^%s*set%s+%-g%s+status%-style%s+', '', 1)
+    local value = original.tmux_status_style_line:gsub('^%s*set%-option%s+%-g%s+status%-style%s+', '', 1):gsub('^%s*set%s+%-g%s+status%-style%s+', '', 1)
     if value ~= '' then
       tmux_set_option('status-style', value)
     end

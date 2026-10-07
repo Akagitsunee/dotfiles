@@ -143,7 +143,6 @@ return {
                 hint = _G.config.icons.diagnostics.hint,
               },
             },
-            
           },
           lualine_x = {
             {
@@ -183,7 +182,7 @@ return {
               icon = _G.config.icons.ui.directory,
               color = { fg = colors.muted },
             },
-            { '%=', padding = 0 },  -- Center align components
+            { '%=', padding = 0 }, -- Center align components
             {
               'datetime',
               icon = _G.config.icons.ui.clock,
