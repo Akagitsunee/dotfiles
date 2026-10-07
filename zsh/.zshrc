@@ -75,3 +75,22 @@ case ":$PATH:" in
   *) export PATH="$PNPM_HOME/bin:$PATH" ;;
 esac
 # pnpm end
+
+# =========================================================
+# Enterprise SSH Agent Fix (Static Socket Configuration)
+# =========================================================
+# Force a unified, static socket location for all tmux windows/panes
+export SSH_AUTH_SOCK="$HOME/.ssh/ssh-agent.sock"
+
+# Verify if the agent is actively responding on this socket
+if ! ssh-add -l >/dev/null 2>&1; then
+    # Clean up broken/stale sockets and start a fresh agent instance
+    rm -f "$SSH_AUTH_SOCK"
+    ssh-agent -a "$SSH_AUTH_SOCK" >/dev/null 2>&1
+fi
+
+# Link with macOS Keychain to pull your client passphrase securely
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    # Automatically add your local private keys to the running agent
+    ssh-add --apple-load-keychain >/dev/null 2>&1
+fi
