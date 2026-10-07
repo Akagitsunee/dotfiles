@@ -1,6 +1,7 @@
 return {
   {
     'neovim/nvim-lspconfig',
+    ft = { 'svelte' },
     opts = {
       servers = {
         svelte = {

@@ -37,7 +37,9 @@ return {
   merge_language_specs {
     'plugins.languages.bashls',
     'plugins.languages.cssls',
-    -- "plugins.languages.eslint",
+    -- "plugins.languages.eslint" is kept but disabled: eslint_d (via nvim-lint/conform,
+    -- see plugins/tools/formatting.lua) already covers linting/formatting, and running
+    -- both would produce duplicate diagnostics.
     'plugins.languages.graphql',
     'plugins.languages.html',
     'plugins.languages.go',

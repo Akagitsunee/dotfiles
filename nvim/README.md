@@ -48,7 +48,7 @@ At minimum:
 Language tooling depends on what you edit, but this config is set up to make use of:
 
 - `node` / `npm` for TypeScript, JavaScript, HTML, CSS, JSON, Markdown, Svelte, Vue, and Prettier-based tooling
-- `go` for Go support
+- `go` for Go support (optional: `gopls`, `goimports`, `gofumpt`, `golangci-lint` and `delve` are only installed by Mason when `go` is on `$PATH`; everything else needs just Node)
 - `luarocks` (auto-installed by the top-level `install.sh`) so Mason can build `luacheck`
 - Mason-managed tools like `lua_ls`, `vtsls`, `gopls`, `yamlls`, `eslint_d`, `prettierd`, `stylua`, `shfmt`, `shellcheck`, `golangci-lint`, and others
 

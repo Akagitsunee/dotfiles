@@ -453,19 +453,47 @@ autocmd('BufWritePost', {
 vim.opt.autoread = true
 
 -- Set up global options that support the autocommands above
+--
+-- This is the single source of truth for vim.diagnostic.config() -- do not
+-- add another call elsewhere, two calls with different keys race against
+-- each other depending on load order.
 vim.schedule(function()
-  -- Ensure diagnostic settings align with autocommands
   vim.diagnostic.config {
     float = {
-      border = _G.config and _G.config.ui and _G.config.ui.border or 'rounded',
-      source = 'always',
+      border = _G.config.ui.border,
+      source = false,
       header = '',
       prefix = '',
+      format = function(diagnostic)
+        local code = diagnostic.user_data and diagnostic.user_data.lsp and diagnostic.user_data.lsp.code
+        if not diagnostic.source or not code then
+          return diagnostic.message
+        end
+
+        local lsp_codes = _G.config.lsp.codes
+        for _, tbl in pairs(lsp_codes) do
+          if vim.tbl_contains(tbl, code) then
+            if diagnostic.source == 'eslint_d' and tbl.icon then
+              return string.format('%s [%s]', tbl.icon .. diagnostic.message, code)
+            end
+            return tbl.message
+          end
+        end
+        return string.format('%s [%s]', diagnostic.message, diagnostic.source)
+      end,
     },
-    virtual_text = _G.config and _G.config.lsp and _G.config.lsp.virtual_text or false,
-    signs = _G.config and _G.config.lsp and _G.config.lsp.signs or true,
-    update_in_insert = _G.config and _G.config.lsp and _G.config.lsp.update_in_insert or false,
-    severity_sort = _G.config and _G.config.lsp and _G.config.lsp.severity_sort or false,
+    severity_sort = _G.config.lsp.severity_sort,
+    virtual_text = _G.config.lsp.virtual_text.enabled,
+    signs = {
+      text = {
+        [vim.diagnostic.severity.ERROR] = _G.config.icons.diagnostics.error,
+        [vim.diagnostic.severity.WARN] = _G.config.icons.diagnostics.warn,
+        [vim.diagnostic.severity.INFO] = _G.config.icons.diagnostics.info,
+        [vim.diagnostic.severity.HINT] = _G.config.icons.diagnostics.hint,
+      },
+    },
+    underline = true,
+    update_in_insert = _G.config.lsp.update_in_insert,
   }
 end)
 

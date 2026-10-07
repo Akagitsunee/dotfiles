@@ -1,4 +1,29 @@
 -- lua/plugins/core/lsp.lua
+
+-- Servers/tools that need a language SDK on $PATH to be useful at all
+-- (e.g. gopls needs `go` to install and to do anything meaningful).
+-- Everything else (JS/TS, shell, yaml, lua, the npm-based web stack, ...)
+-- only needs Node (guaranteed by install.sh via nvm) or nothing, so it's
+-- always installed. This lets nvim work on a fresh machine without the
+-- SDK, instead of Mason repeatedly failing to install servers it can't use.
+local SDK_GATED_TOOLS = {
+  {
+    executable = 'go',
+    servers = { 'gopls' },
+    tools = { 'goimports', 'gofumpt', 'golangci-lint', 'delve' },
+  },
+}
+
+local function with_gated(base_list, field)
+  local list = vim.deepcopy(base_list)
+  for _, gated in ipairs(SDK_GATED_TOOLS) do
+    if vim.fn.executable(gated.executable) == 1 then
+      vim.list_extend(list, gated[field])
+    end
+  end
+  return list
+end
+
 return {
   {
     'neovim/nvim-lspconfig',
@@ -9,40 +34,8 @@ return {
       'nvimdev/lspsaga.nvim',
     },
     config = function(_, opts)
-      vim.diagnostic.config {
-        float = {
-          source = false,
-          format = function(diagnostic)
-            local code = diagnostic.user_data and diagnostic.user_data.lsp and diagnostic.user_data.lsp.code
-            if not diagnostic.source or not code then
-              return diagnostic.message
-            end
-
-            local lsp_codes = _G.config.lsp.codes -- Use the global config
-            for _, tbl in pairs(lsp_codes) do
-              if vim.tbl_contains(tbl, code) then
-                if diagnostic.source == 'eslint_d' and tbl.icon then
-                  return string.format('%s [%s]', tbl.icon .. diagnostic.message, code)
-                end
-                return tbl.message
-              end
-            end
-            return string.format('%s [%s]', diagnostic.message, diagnostic.source)
-          end,
-        },
-        severity_sort = true,
-        virtual_text = false,
-        signs = {
-          text = {
-            [vim.diagnostic.severity.ERROR] = _G.config.icons.diagnostics.error,
-            [vim.diagnostic.severity.WARN] = _G.config.icons.diagnostics.warn,
-            [vim.diagnostic.severity.INFO] = _G.config.icons.diagnostics.info,
-            [vim.diagnostic.severity.HINT] = _G.config.icons.diagnostics.hint,
-          },
-        },
-        underline = true,
-        update_in_insert = false,
-      }
+      -- Diagnostic display is configured once, in config/autocmds.lua -- don't
+      -- duplicate vim.diagnostic.config() here, it'll race against that call.
 
       local capabilities = require('blink.cmp').get_lsp_capabilities()
 
@@ -73,12 +66,11 @@ return {
     config = function()
       require('mason').setup { ui = { border = _G.config.ui.border } }
       require('mason-lspconfig').setup {
-        ensure_installed = {
+        ensure_installed = with_gated({
           'bashls',
           'cssls',
           'graphql',
           'html',
-          'gopls',
           'svelte',
           'jsonls',
           'lua_ls',
@@ -87,7 +79,7 @@ return {
           'yamlls',
           'vue_ls',
           -- 'prismals',
-        },
+        }, 'servers'),
         automatic_enable = true,
       }
     end,
@@ -98,7 +90,7 @@ return {
     event = 'VeryLazy',
     config = function()
       require('mason-tool-installer').setup {
-        ensure_installed = {
+        ensure_installed = with_gated({
           -- Formatters & Linters
           'eslint_d',
           'prettierd',
@@ -106,18 +98,18 @@ return {
           'luacheck',
           'shellcheck',
           'shfmt',
-          'goimports',
-          'gofumpt',
-          'golangci-lint',
-          'delve',
           'markdownlint',
           'yamllint',
           'hadolint',
-        },
+        }, 'tools'),
         run_on_start = true,
         start_delay = 3000,
         debounce_hours = 8,
       }
+      -- The plugin normally triggers itself off a VimEnter autocmd registered in its
+      -- plugin/ script, but since we lazy-load on VeryLazy (which fires after VimEnter
+      -- has already passed), that autocmd never runs. Trigger it ourselves instead.
+      require('mason-tool-installer').run_on_start()
     end,
   },
   -- LSP Saga for Enhanced LSP UI
