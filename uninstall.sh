@@ -52,6 +52,38 @@ remove_managed_links_in_dir() {
   shopt -u nullglob dotglob
 }
 
+firefox_profile_dir() {
+  local base_dir profile_dirs=()
+
+  case "$(uname -s)" in
+    Darwin) base_dir="$HOME/Library/Application Support/Firefox/Profiles" ;;
+    *) base_dir="$HOME/.mozilla/firefox" ;;
+  esac
+
+  [ -d "$base_dir" ] || return
+
+  shopt -s nullglob
+  profile_dirs=("$base_dir"/*.default-release)
+  shopt -u nullglob
+
+  [ "${#profile_dirs[@]}" -eq 1 ] || return
+
+  printf '%s\n' "${profile_dirs[0]}"
+}
+
+remove_firefox_links() {
+  local profile_dir
+
+  profile_dir="$(firefox_profile_dir)"
+  [ -n "$profile_dir" ] || return
+
+  # chrome/ is a synced copy, not a symlink (see install.sh), so remove_link's
+  # symlink check intentionally leaves it in place -- uninstalling shouldn't
+  # delete the live ShyFox theme files out of the profile.
+  remove_link "$profile_dir/chrome"
+  remove_link "$profile_dir/user.js"
+}
+
 main() {
   local target_path
 
@@ -60,6 +92,7 @@ main() {
   done
 
   remove_managed_links_in_dir "$CONFIG_DIR/zsh"
+  remove_firefox_links
 
   printf 'Uninstall complete.\n'
 }

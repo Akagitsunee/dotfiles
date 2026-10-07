@@ -36,6 +36,7 @@ It will:
 - install required CLI tools when missing and a supported package manager is available
 - on macOS with Homebrew, install `ghostty`, `starship`, `borders`, and the JetBrainsMono Nerd Font if missing
 - install or update tmux plugins in `~/.config/tmux/plugins`
+- sync the ShyFox theme into the Firefox profile and link `user.js` (see [Browser](#browser))
 - symlink the configs from this repo into `~` and `~/.config`
 
 ### Prerequisites not automated
@@ -95,6 +96,13 @@ Node itself is intentionally **not** installed by this repo. `install.sh` clones
 - `tmux` itself is auto-installed by `install.sh` if missing (ghostty launches straight into it, so this matters)
 - tmux plugins -> `~/.config/tmux/plugins/`
 - [`tmux-powerline/`](tmux-powerline) -> `~/.config/tmux-powerline/`
+
+### Browser
+
+- [`firefox/chrome/`](firefox/chrome) is **synced (copied), not symlinked**, into `<Firefox profile>/chrome/` — the ShyFox userChrome theme (auto-hiding toolbars/urlbar, plus a Sidebery skin). Firefox refuses to apply `userContent.css`'s `@-moz-document` rule targeting Sidebery's `moz-extension://` sidebar page when the source resolves outside the profile directory via a symlink (confirmed by reproducing it twice); a real copy inside the profile works fine. This means editing the theme requires re-running `install.sh` to push changes into the live profile — it won't reflect instantly like a symlink would.
+- [`firefox/user.js`](firefox/user.js) -> `<Firefox profile>/user.js` — still a normal symlink, since it's just a prefs file and unaffected by the above restriction. Sets `toolkit.legacyUserProfileCustomizations.stylesheets` (required for the theme to load at all) and `sidebar.revamp=false` (reverts Firefox 154+'s new native sidebar default, which otherwise breaks Sidebery's and ShyFox's sidebar layout).
+- the profile path is resolved at install/uninstall time by globbing `*.default-release` under the platform's Firefox profiles directory (macOS: `~/Library/Application Support/Firefox/Profiles`, Linux: `~/.mozilla/firefox`), since the profile folder name includes a random per-install prefix; if none or more than one match is found, linking/syncing is skipped with a logged message rather than guessing
+- requires the **Userchrome Toggle Extended** and **Sidebery** Firefox addons, installed manually via Firefox's Add-ons Manager — neither the addons nor Userchrome Toggle Extended's Style 1/2/3 toggle state are portable, so re-enable/re-toggle them by hand after a fresh install
 
 ### Window management
 

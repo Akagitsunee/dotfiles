@@ -127,6 +127,31 @@ link_target() {
   log "Linked $target_path -> $source_path"
 }
 
+sync_dir_target() {
+  local source_dir="$1"
+  local target_dir="$2"
+
+  if [ ! -d "$source_dir" ]; then
+    log "Skipped missing source: $source_dir"
+    return
+  fi
+
+  if [ -L "$target_dir" ] || { [ -e "$target_dir" ] && [ ! -d "$target_dir" ]; }; then
+    backup_target "$target_dir"
+  fi
+
+  mkdir -p "$target_dir"
+
+  if command -v rsync >/dev/null 2>&1; then
+    rsync -a --delete "$source_dir"/ "$target_dir"/
+  else
+    rm -rf "$target_dir"
+    cp -R "$source_dir" "$target_dir"
+  fi
+
+  log "Synced $target_dir <- $source_dir"
+}
+
 sync_repo() {
   if [ ! -d "$DOTFILES_DIR/.git" ]; then
     return
@@ -361,6 +386,48 @@ link_zsh_config_files() {
   shopt -u nullglob
 }
 
+firefox_profile_dir() {
+  local base_dir profile_dirs=()
+
+  case "$(uname -s)" in
+    Darwin) base_dir="$HOME/Library/Application Support/Firefox/Profiles" ;;
+    *) base_dir="$HOME/.mozilla/firefox" ;;
+  esac
+
+  [ -d "$base_dir" ] || return
+
+  shopt -s nullglob
+  profile_dirs=("$base_dir"/*.default-release)
+  shopt -u nullglob
+
+  case "${#profile_dirs[@]}" in
+    0)
+      log "Skipped Firefox config: no *.default-release profile found in $base_dir"
+      ;;
+    1)
+      printf '%s\n' "${profile_dirs[0]}"
+      ;;
+    *)
+      log "Skipped Firefox config: multiple *.default-release profiles found in $base_dir: ${profile_dirs[*]}"
+      ;;
+  esac
+}
+
+link_firefox_config() {
+  local profile_dir
+
+  profile_dir="$(firefox_profile_dir)"
+  [ -n "$profile_dir" ] || return
+
+  # chrome/ is synced (copied), not symlinked: Firefox refuses to apply
+  # userContent.css's @-moz-document rule targeting Sidebery's moz-extension://
+  # sidebar page when the source resolves outside the profile directory via a
+  # symlink -- confirmed by reproducing it twice. user.js is unaffected (it's
+  # just a prefs file, not part of that content-CSS-into-extension-page path).
+  sync_dir_target "$DOTFILES_DIR/firefox/chrome" "$profile_dir/chrome"
+  link_target "$DOTFILES_DIR/firefox/user.js" "$profile_dir/user.js"
+}
+
 main() {
   local entry target_name source_relative
 
@@ -395,6 +462,7 @@ main() {
   done
 
   link_zsh_config_files
+  link_firefox_config
 
   if [ "$BACKUP_USED" -eq 1 ]; then
     log "Existing files were moved to $BACKUP_DIR"
