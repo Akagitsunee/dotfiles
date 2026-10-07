@@ -42,6 +42,7 @@ It will:
 ### Prerequisites not automated
 
 - **Homebrew itself** — `install.sh` uses it to install other tools but does not install it. On a fresh Mac, install it first from [brew.sh](https://brew.sh).
+- **uv** — the `python`/`pip` aliases route through it, so they fail without it; install it from [docs.astral.sh/uv](https://docs.astral.sh/uv/).
 - **AeroSpace** — window manager the `aerospace/` config targets; install manually (`brew install --cask nikitabobko/tap/aerospace`).
 - **Fonts for `wezterm/`** — if you go back to using wezterm, its fallback list expects several Nerd Fonts beyond the JetBrainsMono one `install.sh` installs for ghostty (FiraCode, CaskaydiaCove, SauceCodePro, CommitMono, RobotoMono); install what you need manually.
 
@@ -67,6 +68,15 @@ This repo only keeps personal config and custom files. Third-party dependencies 
 - `.zshrc` pins `SSH_AUTH_SOCK` to the static socket `~/.ssh/ssh-agent.sock`, starts an agent there if none answers, and loads keys from the macOS keychain; `tmux.conf` points tmux at the same socket so every pane shares one agent
 - `MANPAGER` pipes through `col -bx` before `bat` so man pages render without backspace overstrike; `~/.local/bin` is prepended last in `.zshenv`, so it wins over the other PATH entries
 - Debian/Ubuntu package names are normalized when needed by linking `batcat` -> `bat` and `fdfind` -> `fd` in `~/.local/bin`
+
+#### Aliases
+
+[`zsh/aliases.zsh`](zsh/aliases.zsh) deliberately overrides several commands:
+
+- `ls` / `tree` -> `eza`, `grep` -> `rg`, `vim` -> `nvim`
+- `npm` -> `pnpm`, `npx` -> `pnpm dlx`
+- `python` / `python3` -> `uv run python`, `pip` / `pip3` -> `uv pip`
+- `stim` -> `caffeinate -dimsu` (macOS: keep display, system and disks awake and simulate user activity)
 
 #### Node
 
