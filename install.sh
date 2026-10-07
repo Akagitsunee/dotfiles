@@ -45,11 +45,6 @@ CLI_TOOL_PACKAGES=(
   "zsh rg ripgrep ripgrep ripgrep ripgrep"
   "tmux tmux tmux tmux tmux tmux"
   "nvim nvim neovim neovim neovim neovim"
-  # Build prerequisite for Mason-managed tools it can't self-install (e.g.
-  # luacheck, which Mason builds via `luarocks make`). Not itself a
-  # Mason-installed binary -- Mason owns LSP servers/linters/formatters,
-  # this only supplies what Mason's build step needs.
-  "nvim luarocks luarocks luarocks luarocks luarocks"
   # nvim-treesitter's `main` branch (see nvim/lua/plugins/core/treesitter.lua)
   # shells out to the tree-sitter CLI to install/update parsers.
   "nvim tree-sitter tree-sitter-cli tree-sitter-cli tree-sitter-cli tree-sitter-cli"

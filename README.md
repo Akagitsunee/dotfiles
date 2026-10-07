@@ -114,7 +114,7 @@ Node itself is intentionally **not** installed by this repo. `install.sh` clones
 
 - [`nvim/`](nvim) -> `~/.config/nvim/`
 - `nvim` itself is auto-installed (as `neovim`) by `install.sh` if missing
-- `luarocks` is auto-installed by `install.sh` — Mason (inside nvim) needs it to build `luacheck`; everything else Mason installs is a prebuilt binary with no external prerequisite
+- everything Mason installs is a prebuilt binary or an npm package (Node comes from nvm), so no extra system prerequisite is installed for it
 - Go tooling is gated on `go`: `gopls`, `goimports`, `gofumpt`, `golangci-lint` and `delve` are only installed by Mason when `go` is on `$PATH`, so nvim works on a fresh machine without the Go SDK (see [`nvim/README.md`](nvim/README.md#requirements))
 - not yet automated: the build toolchain some plugins need (`make`, a C compiler, and `go` if you want Go support; `blink.cmp`/`blink.pairs` ship prebuilt binaries, so `cargo` is no longer needed) — see [`nvim/README.md`](nvim/README.md#requirements)
 

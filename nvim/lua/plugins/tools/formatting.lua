@@ -24,7 +24,7 @@ return {
           vue = { 'prettierd' },
           -- python = { "isort", "black" },
           -- java = { "google-java-format" },
-          go = { 'goimports', 'gofumpt' },
+          go = vim.fn.executable 'goimports' == 1 and { 'goimports', 'gofumpt' } or nil,
           sh = { 'shfmt' },
         },
 
@@ -38,29 +38,33 @@ return {
           -- Skip formatting for large files (performance)
           local max_filesize = 100 * 1024 -- 100 KB
           local ok, stats = pcall(vim.uv.fs_stat, vim.api.nvim_buf_get_name(bufnr))
-          if ok and stats and stats.size > max_filesize then
+          if (ok and stats and stats.size > max_filesize) or vim.b[bufnr].large_file then
             return false
           end
 
+          -- prettierd's first call has to start its daemon, so leave room for that.
           return {
-            timeout_ms = 1000,
-            lsp_fallback = true,
+            timeout_ms = 2000,
+            lsp_format = 'fallback',
           }
         end,
 
         formatters = {
-          stylua = {
-            prepend_args = { '--indent-type', 'Spaces', '--indent-width', '2' },
-          },
+          -- stylua reads nvim/.stylua.toml by itself, no extra args needed.
+          --
+          -- prettierd accepts exactly ONE argument (the file path) and has no
+          -- CLI options: extra flags make it fail with "Only a single file path
+          -- is supported". Defaults therefore live in a config file that prettierd
+          -- only uses when a project has no prettier config of its own.
           prettierd = {
-            prepend_args = { '--tab-width', '2', '--single-quote', 'true' },
+            env = { PRETTIERD_DEFAULT_CONFIG = vim.fn.stdpath 'config' .. '/prettierrc.json' },
           },
         },
       }
 
       -- 🎮 User Commands for Manual Control
       vim.api.nvim_create_user_command('Format', function()
-        require('conform').format { timeout_ms = 1000, lsp_fallback = true }
+        require('conform').format { timeout_ms = 2000, lsp_format = 'fallback' }
       end, { desc = 'Format current buffer with smart detection' })
 
       vim.api.nvim_create_user_command('FormatToggle', function()
@@ -103,19 +107,9 @@ return {
         go = { 'golangcilint' },
         dockerfile = { 'hadolint' },
         sh = { 'shellcheck' },
-        lua = { 'luacheck' },
-      }
-
-      -- 🔧 Custom Linter Settings
-      lint.linters.luacheck.args = {
-        '--globals',
-        'vim',
-        '_G',
-        '--formatter',
-        'plain',
-        '--codes',
-        '--ranges',
-        '-',
+        -- Lua has no linter here on purpose: Mason's luacheck is built against the system
+        -- Lua 5.5 and crashes on load ("attempt to assign to const variable"), so it
+        -- silently produced no diagnostics. lua_ls already reports them.
       }
 
       -- ⚡ Smart Linting Function
