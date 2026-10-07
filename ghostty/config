@@ -73,6 +73,10 @@ background-blur = true
 # Save window state 
 window-save-state = always
 
+# Make text on baxkground actually visible: 
+faint-opacity = 0.8
+minimum-contrast = 1.25
+
 # ============================================================================
 # TABS
 # ============================================================================
