@@ -279,9 +279,10 @@ Navigation bar on top of the window
       top: calc(var(--top-margin) + var(--margin));
       transition: none !important;
 
-      /* translucent but readable: --tb-col can resolve to transparent on newer Firefox */
+      /* readable: --tb-col can resolve to transparent on newer Firefox.
+         No backdrop-filter here: it makes #nav-bar the containing block of the
+         position:fixed #unified-extensions-button/#PanelUI-menu-button, which then jump under the urlbar. */
       background-color: color-mix(in srgb, color-mix(in srgb, var(--bg-col) 92%, white) 70%, transparent) !important;
-      backdrop-filter: blur(14px);
 
       /* corners, shadow */
       border: var(--outline) !important;
