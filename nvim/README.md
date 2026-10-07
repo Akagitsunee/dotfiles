@@ -49,7 +49,6 @@ Language tooling depends on what you edit, but this config is set up to make use
 
 - `node` / `npm` for TypeScript, JavaScript, HTML, CSS, JSON, Markdown, Svelte, Vue, and Prettier-based tooling
 - `go` for Go support (optional: `gopls`, `goimports`, `gofumpt`, `golangci-lint` and `delve` are only installed by Mason when `go` is on `$PATH`; everything else needs just Node)
-- `luarocks` (auto-installed by the top-level `install.sh`) so Mason can build `luacheck`
 - Mason-managed tools like `lua_ls`, `vtsls`, `gopls`, `yamlls`, `eslint_d`, `prettierd`, `stylua`, `shfmt`, `shellcheck`, `golangci-lint`, and others
 
 ## Install
@@ -85,7 +84,12 @@ On first start, `lazy.nvim` will bootstrap itself and install plugins. Mason wil
 
 ## Notes
 
-- Theme state is persisted through `lua/nvconfig.lua`
+- Theme state is persisted through `lua/nvconfig.lua`; the compiled base46 cache (`.base46_cache/`) is only rebuilt when the theme or the transparency setting changes (stamp in `$XDG_STATE_HOME/nvim/base46.stamp`), not on every start
+- Floating windows (pickers, Lazy, which-key, completion menu) are always opaque: `ui.blend`/`ui.winblend` are `0` in `lua/config/globals.lua` because any value above 0 lets the text underneath bleed through blank cells. `:ToggleTransparency` / `<leader>ut` only makes the editor background, statusline and file tree transparent
+- Formatting uses `prettierd`, which takes no CLI flags; its fallback options (2 spaces, single quotes) live in `prettierrc.json` and are only used when a project has no prettier config of its own
+- The external theme sync (`lua/config/theme_sync.lua`) only runs inside Ghostty/tmux with a UI attached, writes files only when their content changed, and restores the originals on exit
+- Keymaps worth knowing: `gsa/gsd/gsr` surround (mini.surround), `]c`/`[c` next/previous git hunk, `]]`/`[[`/`][`/`[]` class motions (treesitter textobjects), `<leader>ll` Lazy, `<leader>W` write and quit, `<leader>Q` quit all
+- Files over 1 MB are flagged with `vim.b.large_file`: no treesitter, no LSP attach, no format-on-save, syntax off (the flag is buffer-local, other buffers are unaffected)
 - Filetype-specific tweaks live under `after/ftplugin`
 - This config disables several builtin providers/plugins intentionally to reduce startup noise and overhead
 - `doc/kickstart.txt` is leftover reference material from the original starting point, not the source of truth for this config
