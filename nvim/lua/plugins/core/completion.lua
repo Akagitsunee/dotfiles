@@ -99,8 +99,8 @@ return {
       ['<C-d>'] = { 'scroll_documentation_down', 'fallback' },
       ['<C-e>'] = { 'cancel', 'fallback' },
       ['<Esc>'] = { 'cancel', 'fallback' },
-      -- Quick accept with Ctrl+Space
-      ['<C-Space>'] = { 'accept', 'fallback' },
+      -- Quick accept. Not <C-Space>: that is the tmux prefix and never reaches nvim.
+      ['<C-y>'] = { 'accept', 'fallback' },
     },
 
     appearance = {

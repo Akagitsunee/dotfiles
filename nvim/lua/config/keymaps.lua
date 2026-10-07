@@ -45,11 +45,8 @@ keymap('n', '<leader>ld', '<cmd>Lazy debug<cr>', desc_opts 'Lazy Debug')
 -- │                      ESSENTIALS                         │
 -- ╰─────────────────────────────────────────────────────────╯
 
--- Better window navigation
-keymap('n', '<C-h>', '<C-w>h', desc_opts 'Move focus to the left window')
-keymap('n', '<C-j>', '<C-w>j', desc_opts 'Move focus to the lower window')
-keymap('n', '<C-k>', '<C-w>k', desc_opts 'Move focus to the upper window')
-keymap('n', '<C-l>', '<C-w>l', desc_opts 'Move focus to the right window')
+-- Window navigation: <C-h/j/k/l> are provided by vim-tmux-navigator (plugins/editor/tmux.lua),
+-- which moves between nvim splits and tmux panes alike.
 
 -- Resize windows with arrows
 keymap('n', '<C-Up>', ':resize -2<CR>', desc_opts 'Decrease window height')

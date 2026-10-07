@@ -151,6 +151,9 @@ return {
       local function on_attach(bufnr)
         api.config.mappings.default_on_attach(bufnr)
 
+        -- <C-k> (node info) would shadow vim-tmux-navigator's "focus up" inside the tree.
+        pcall(vim.keymap.del, 'n', '<C-k>', { buffer = bufnr })
+
         local function map(lhs, rhs, desc)
           vim.keymap.set('n', lhs, rhs, { buffer = bufnr, noremap = true, silent = true, nowait = true, desc = desc })
         end

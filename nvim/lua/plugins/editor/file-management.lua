@@ -16,6 +16,9 @@ return {
       ['<C-p>'] = 'actions.preview',
       ['<C-c>'] = 'actions.close',
       ['<C-r>'] = 'actions.refresh',
+      -- Free <C-h>/<C-l> for vim-tmux-navigator (oil's defaults: split / refresh).
+      ['<C-h>'] = false,
+      ['<C-l>'] = false,
     },
     view_options = {
       show_hidden = true,
